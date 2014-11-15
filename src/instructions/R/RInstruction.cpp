@@ -35,15 +35,16 @@ class RInstruction : public Instruction {
 
             stringstream ss;
             ss << OpCodeStrings[getOpCode()] << " " \
-                << "R" << registerD << ", " \
-                << "R" << registerS << ", ";
+                << "R" << registerD << ", ";
 
             if (getOpCode() == SLL ||
                     getOpCode() == SRL ||
                     getOpCode() == SRA) {
-                    ss << "#" << shiftAmount;
+                ss << "R" << registerT << ", ";
+                ss << "#" << shiftAmount;
             } else {
-                    ss << "R" << registerT;
+                ss << "R" << registerS << ", ";
+                ss << "R" << registerT;
             }
             return ss.str();
         }
