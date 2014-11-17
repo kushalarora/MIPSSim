@@ -14,7 +14,7 @@ class IInstruction : public Instruction {
         IInstruction(int lineNo, string bitString) : Instruction(lineNo, bitString) {
             registerS = toInt(bitString.substr(6, 5));
             registerT = toInt(bitString.substr(11, 5));
-            immediate = twosComplement(toInt(bitString.substr(16, 16)), 16);
+            immediate = fromTwosComplement(toInt(bitString.substr(16, 16)), 16);
 
             setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
         }

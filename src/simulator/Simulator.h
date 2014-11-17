@@ -1,6 +1,7 @@
 #include "../Data.cpp"
 #include "../commons.h"
 #include "../instructions/Instruction.h"
+#include "../instructions/InstructionBuilder.cpp"
 #include<string>
 #include<queue>
 #include<vector>
@@ -12,15 +13,13 @@ class Simulator {
     private:
         queue<Instruction*> instructionQueue;
         vector<Data*> memory;
+        unsigned int regstr[32];
         char* logFileName;
     public:
         Simulator(char* logFileName) {
             this->logFileName = logFileName;
         }
-        void addInstruction(Instruction* instruction) {
-            instructionQueue.push(instruction);
-        }
-        void addData(Data* data) {
+        void addToMemory(Data* data) {
             memory.push_back(data);
         }
         virtual void run()  = 0;

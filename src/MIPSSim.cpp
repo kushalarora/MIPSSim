@@ -2,7 +2,6 @@
 #include <cassert>
 #include "simulator/SimulatorBuilder.cpp"
 #include "simulator/Simulator.h"
-#include "instructions/InstructionBuilder.cpp"
 #include "Data.cpp"
 #include<fstream>
 #include<sstream>
@@ -65,17 +64,10 @@ int main(int argc, char* argv[]) {
 
     char buffer[4];
     string binaryString;
-    bool isBreak = false;
-    int lineNo = 600;
+    int PC = 600;
     while(readline(infile, binaryString)) {
-        if (!isBreak) {
-            Instruction* instruction = InstructionBuilder::build(lineNo, binaryString);
-            simulator->addInstruction(instruction);
-            isBreak = instruction->getOpCode() == BREAK;
-        } else {
-            simulator->addData(new Data(lineNo, binaryString));
-        }
-        lineNo += 4;
+        simulator->addToMemory(new Data(PC, binaryString));
+        PC += 4;
     }
     simulator->run();
 }

@@ -6,18 +6,20 @@ class DisAssembler : public Simulator {
         virtual void run() {
             ofstream logFile;
             logFile.open(getLogFileName());
-            queue<Instruction*> q = getQueue();
-            while (!q.empty()) {
-                Instruction* instrP = q.front();
-                logFile << instrP->toString() << endl;
-                q.pop();
-            }
 
             vector<Data*> mem = getMemory();
             vector<Data*>::iterator it;
 
+            bool isBreak = false;
             for (it = mem.begin(); it != mem.end(); it++) {
-                logFile << (*it)->toString() << endl;
+                Data* data = *it;
+                if (!isBreak) {
+                    Instruction* instP = InstructionBuilder::build(data->getAddress(), data->getBitString());
+                    logFile << instP->toString() << endl;
+                    isBreak = instP->getOpCode() == BREAK;
+                } else {
+                    logFile << (*it)->toString() << endl;
+                }
             }
 
             logFile.close();
