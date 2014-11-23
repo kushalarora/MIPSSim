@@ -1,5 +1,8 @@
 #include "../commons.h"
 #include "Simulator.h"
+
+#ifndef __MIPS_DISASSEMBLER__
+#define __MIPS_DISASSEMBLER__
 class DisAssembler : public Simulator {
     public:
         DisAssembler(char* logFileName) : Simulator(logFileName){}
@@ -25,3 +28,4 @@ class DisAssembler : public Simulator {
             logFile.close();
         }
 };
+#endif

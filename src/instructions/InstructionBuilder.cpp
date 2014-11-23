@@ -1,6 +1,4 @@
 
-#ifndef __MIPS_INST_BUILDER__
-#define __MIPS_INST_BUILDER__
 #include<iostream>
 #include "J/JInstruction.cpp"
 #include "R/RInstruction.cpp"
@@ -10,6 +8,8 @@
 #include<string>
 
 using namespace std;
+#ifndef __MIPS_INST_BUILDER__
+#define __MIPS_INST_BUILDER__
 class InstructionBuilder {
     public:
         static Instruction* build(int lineNo, string bitString) {

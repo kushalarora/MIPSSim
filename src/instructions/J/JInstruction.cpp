@@ -3,7 +3,8 @@
 #include "../Instruction.h"
 #include "../OpcodeMap.h"
 using namespace std;
-
+#ifndef __MIPS_JINST__
+#define __MIPS_JINST__
 class JInstruction : public Instruction  {
     private:
         int address;
@@ -27,3 +28,4 @@ int main() {
     cout << instr.toString();
 }
 */
+#endif

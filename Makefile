@@ -2,7 +2,7 @@ GTEST_DIR = ${HOME}/gtest/
 CC = g++
 INCLUDES = -I${GTEST_DIR}/include
 SOURCE_FILES=src/MIPSSim.cpp src/commons.cpp \
-		src/simulator/DisAssembler.cpp src/simulator/Executor.cpp src/simulator/SimulatorBuilder.cpp \
+		 src/simulator/SimulatorBuilder.cpp src/simulator/Executor.cpp \
 		src/instructions/InstructionBuilder.cpp src/instructions/I/IInstruction.cpp \
 		src/instructions/R/RInstruction.cpp src/instructions/J/JInstruction.cpp src/instructions/OpcodeMap.cpp
 OBJECT_FILES = $(SOURCE_FILES:.cpp=.o)

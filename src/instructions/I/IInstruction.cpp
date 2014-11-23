@@ -4,7 +4,8 @@
 #include "../OpcodeMap.h"
 
 using namespace std;
-
+#ifndef __MIPS_IINST__
+#define __MIPS_IINST__
 class IInstruction : public Instruction {
     private:
         int registerS;
@@ -61,3 +62,4 @@ int main() {
     cout << instr3.toString();
     cout << "\n";
 }*/
+#endif

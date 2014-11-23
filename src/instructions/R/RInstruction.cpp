@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#ifndef __MIPS_RINST__
+#define __MIPS_RINST__
 class RInstruction : public Instruction {
     private:
         int registerS;
@@ -63,3 +65,4 @@ int main() {
     cout << "\n";
 }
 */
+#endif
