@@ -22,25 +22,6 @@ class Executor : public Simulator {
             nextPC = 600;
         }
 
-        void run(); 
+        void run();
 };
-/*
-void Executor::instFetchStage() {
-    // Read memory for nextPC.
-    // Add instruction to instructionQueue
-    // Check BTB for next address
-    // update nextPC
-}
-
-
-void Executor::decodeStage() {
-    // Read instructionQueue. If empty do nothing
-    // Else decode Instruction using instructionBuilder.
-    // Check ROB and
-}
-
-void Executor::run() {
-            cout << "Executor Running";
-        }
-*/
 #endif
