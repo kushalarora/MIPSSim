@@ -2,10 +2,13 @@
 #include<string>
 #include<sstream>
 #include<algorithm>
+#include<cassert>
 #ifndef __MIPSSIM_COMMONS__
 #define __MIPSSIM_COMMONS__
 using namespace std;
 enum Operation {DIS, SIM};
+
+const unsigned int BASE_PC = 600;
 
 enum INSTRUCTIONS {
     SW, LW,
