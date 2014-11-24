@@ -1,3 +1,4 @@
+#include<cassert>
 #include<map>
 #include<string>
 #include<cassert>
@@ -12,6 +13,12 @@ class BTBEntry {
     public:
         unsigned int predictedPC;    // predicted program counter
         bool prediction;    // prediction true = taken false = not taken
+
+	public:
+	BTBEntry(unsigned int predictedPC, bool predicted){
+		this->predictedPC = predictedPC;
+		this->prediction = prediction;
+	}
 };
 
 class BranchTargetBuffer {
@@ -19,12 +26,15 @@ class BranchTargetBuffer {
         long long tick;
         map<int, BTBEntry*> buffer;     // pc to BTBEntry
         map<int, long long> lastedTickedAt;  // pc to last tick. Used to morph LRU behavior
+	static const int MAXSIZE = 16;	// maximum size of BTB
+	int size;	//Current size of BTB
     public:
         BranchTargetBuffer() {
-            tick = 0;
+        	tick = 0;
+		size = 0;
         }
 
-        void updateOrAdd(unsigned int PC, unsigned int nextPC, bool taken);
+        void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
         unsigned int getNextPC(unsigned int PC);
 };
 
