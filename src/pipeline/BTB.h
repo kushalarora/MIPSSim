@@ -1,5 +1,7 @@
 #include<map>
 #include<string>
+#include<cassert>
+#include "../commons.h"
 
 using namespace std;
 
@@ -7,7 +9,7 @@ using namespace std;
 #define __MIPS_BTB__
 
 class BTBEntry {
-    private:
+    public:
         unsigned int predictedPC;    // predicted program counter
         bool prediction;    // prediction true = taken false = not taken
 };

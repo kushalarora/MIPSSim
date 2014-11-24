@@ -12,6 +12,8 @@ class Executor : public Simulator {
         ROB rob;
         ReservationStation resStation;
         unsigned int nextPC;
+        unsigned int registerStatus[32];
+        unsigned int executionCycle;
     public:
         void instFetchStage();
         void decodeStage();
@@ -20,6 +22,7 @@ class Executor : public Simulator {
         void commitStage();
         Executor(char* logFileName) : Simulator(logFileName) {
             nextPC = 600;
+            executionCycle = 0;
         }
 
         void run();

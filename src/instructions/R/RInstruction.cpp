@@ -16,7 +16,7 @@ class RInstruction : public Instruction {
         int registerD;
         int shiftAmount;
     public:
-        RInstruction(int lineNo, string bitString) : Instruction(lineNo, bitString) {
+        RInstruction(int lineNo, string bitString, unsigned int executionCycle) : Instruction(lineNo, bitString, executionCycle) {
             registerS = toInt(bitString.substr(6, 5));
             registerT = toInt(bitString.substr(11, 5));
             registerD = toInt(bitString.substr(16, 5));
@@ -54,13 +54,13 @@ class RInstruction : public Instruction {
 
 /*
 int main() {
-    RInstruction instr1 = RInstruction(600, "00000000000000000000000000000000");
+    RInstruction instr1 = RInstruction(600, "00000000000000000000000000000000", -1);
     cout << instr1.toString();
     cout << "\n";
-    RInstruction instr2 = RInstruction(604, "00000000000000000000000000001101");
+    RInstruction instr2 = RInstruction(604, "00000000000000000000000000001101", -1);
     cout << instr2.toString();
     cout << "\n";
-    RInstruction instr3 = RInstruction(608, "00000000001000100010100000100000");
+    RInstruction instr3 = RInstruction(608, "00000000001000100010100000100000", -1);
     cout << instr3.toString();
     cout << "\n";
 }

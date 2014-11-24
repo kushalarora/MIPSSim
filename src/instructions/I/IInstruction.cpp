@@ -12,7 +12,7 @@ class IInstruction : public Instruction {
         int registerT;
         int immediate;
     public:
-        IInstruction(int lineNo, string bitString) : Instruction(lineNo, bitString) {
+        IInstruction(int lineNo, string bitString, unsigned int executionCycle) : Instruction(lineNo, bitString, executionCycle) {
             registerS = toInt(bitString.substr(6, 5));
             registerT = toInt(bitString.substr(11, 5));
             immediate = fromTwosComplement(toInt(bitString.substr(16, 16)), 16);
@@ -52,13 +52,13 @@ class IInstruction : public Instruction {
 
 /*
 int main() {
-    IInstruction instr1 = IInstruction(600, "00100000000010000000000000101100");
+    IInstruction instr1 = IInstruction(600, "00100000000010000000000000101100", -1);
     cout << instr1.toString();
     cout << "\n";
-    IInstruction instr2 = IInstruction(604, "10001100100000100000001011001100");
+    IInstruction instr2 = IInstruction(604, "10001100100000100000001011001100", -1);
     cout << instr2.toString();
     cout << "\n";
-    IInstruction instr3 = IInstruction(608, "00010001010010000000000000000001");
+    IInstruction instr3 = IInstruction(608, "00010001010010000000000000000001", -1);
     cout << instr3.toString();
     cout << "\n";
 }*/

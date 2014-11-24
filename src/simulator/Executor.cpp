@@ -1,20 +1,42 @@
 #include "Executor.h"
-
-
 void Executor::instFetchStage() {
     // Read memory for nextPC.
     // Add instruction to instructionQueue
+    Data* data = getMemoryData(nextPC);
+    instructionQueue.push(new RawInstruction(data, executionCycle + 1));
+
     // Check BTB for next address
     // update nextPC
+    nextPC = btb.getNextPC(nextPC);
 }
 
 
 void Executor::decodeStage() {
     // Read instructionQueue. If empty do nothing
+    if (instructionQueue.size() == 0) {
+        return;
+    }
+
+    RawInstruction* rawInst = instructionQueue.front();
+
+    // If front most inst not scheduled for this cycle, then do nothing
+    if (rawInst->getDecodeCycle() > executionCycle) {
+        return;
+    }
+
     // Else decode Instruction using instructionBuilder.
+    Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(), rawInst->getBitString(), executionCycle + 1);
+
     // Check ROB and RS. If not empty, do nothing
+    if (rob.isFull() || resStation.isFull()) {
+        return;
+    }
     // Else add to ROB. Update instruction with ROB address for returned value.
+    ROBSlot* slotEntry = rob.queueInstruction(instruction);
+    instruction->setROBId(slotEntry->getIndex());
+
     // Add entry to RS. Update arguments from register or ROB. (Qj, Qk,Vj, Vk)
+    resStation.add(instruction);
 }
 
 
@@ -59,7 +81,6 @@ void Executor::writeResultStage() {
     // Store, Branch. NOP and BREAK will skip this step.
     // This step also update values in ROB and make ROB instruction ready to commit.
 
-
     /* Figure out handling of load and store in write result stage */
 }
 
@@ -68,7 +89,7 @@ void Executor::commitStage() {
     // Commit is in order. One instruction from top of the queue.
     //
     // For ALU instruction, register is updated with the result and instruction removed from ROB and RS.
-    // *** Doesn't make sense ***  Load commit is same, just that results written to memory.
+    // Load commit is same.
     // Store updates memory. Any dependent load is wakened up and does memory access in next cycle.
 
 
@@ -80,5 +101,16 @@ void Executor::commitStage() {
 }
 
 void Executor::run() {
-        cout << "Executor Running";
+
+    // TODO: Add stop condition
+    while (true) {
+        executionCycle++;
+
+        instFetchStage();
+        decodeStage();
+        executeStage();
+        writeResultStage();
+        commitStage();
+    }
 }
+

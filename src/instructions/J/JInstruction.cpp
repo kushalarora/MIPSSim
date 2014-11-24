@@ -9,7 +9,7 @@ class JInstruction : public Instruction  {
     private:
         int address;
     public:
-        JInstruction(int lineNo, string bitString) : Instruction(lineNo, bitString) {
+        JInstruction(int lineNo, string bitString, unsigned int executionCycle) : Instruction(lineNo, bitString, executionCycle) {
             address = toInt(bitString.substr(6, 26)) * 4;
 
             setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
@@ -24,7 +24,7 @@ class JInstruction : public Instruction  {
 
 /*
 int main() {
-    JInstruction instr = JInstruction(600, "00001000000000000000000010011110");
+    JInstruction instr = JInstruction(600, "00001000000000000000000010011110", -1);
     cout << instr.toString();
 }
 */

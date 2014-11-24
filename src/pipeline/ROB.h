@@ -1,6 +1,7 @@
 #include<queue>
 #include "../instructions/Instruction.h"
-
+#include<cassert>
+#include<climits>
 using namespace std;
 
 #ifndef __MIPS_ROB__
@@ -8,33 +9,48 @@ using namespace std;
 
 class ROBSlot {
     private:
-        int index;
-        bool busy;
-        Instruction& instruction;
-        STATE state;
+        unsigned int index;
+        bool ready;
+        Instruction* instruction;
         unsigned int destination;
         int value;
 
     public:
         // TODO:: Add Constructor
         int getIndex() { return index; }
-        bool isBusy() { return busy; }
-        Instruction& getInstruction() { return instruction; }
-        STATE getState() { return state; }
+        bool isReady() { return ready; }
+        Instruction* getInstruction() { return instruction; }
         int getDestination() { return destination; }
         int getValue() { return value; }
+        void setValue() { this->value = value;}
 
+        ROBSlot(int index, Instruction* instruction) {
+           ready = false;
+           this->instruction  = instruction;
+
+           // determine destination
+           // TODO::Incomplete
+           if (instruction->getOpCode() == SW) {
+                destination = -1;
+           }
+           value = INT_MIN;
+        }
 };
 
 
 class ROB {
     private:
         queue<ROBSlot*> robQueue;
+        int index;  // index starts at 1.
     public:
         static const int MAXSIZE = 6;
         bool isFull() { return robQueue.size() == MAXSIZE; }
-        void queueInstruction(Instruction& instruction);
-        void dequeueInstruction();
+        ROBSlot* queueInstruction(Instruction* instruction);
+        ROBSlot* dequeueInstruction();
+
+        ROB() {
+            index = 0;
+        }
 };
 
 #endif

@@ -4,7 +4,8 @@ INCLUDES = -I${GTEST_DIR}/include
 SOURCE_FILES=src/MIPSSim.cpp src/commons.cpp \
 		 src/simulator/SimulatorBuilder.cpp src/simulator/Executor.cpp \
 		src/instructions/InstructionBuilder.cpp src/instructions/I/IInstruction.cpp \
-		src/instructions/R/RInstruction.cpp src/instructions/J/JInstruction.cpp src/instructions/OpcodeMap.cpp
+		src/instructions/R/RInstruction.cpp src/instructions/J/JInstruction.cpp src/instructions/OpcodeMap.cpp	\
+		src/pipeline/ROB.cpp src/pipeline/ReservationStation.cpp src/pipeline/BTB.cpp
 OBJECT_FILES = $(SOURCE_FILES:.cpp=.o)
 EXECUTABLE = target/MIPSSim
 
