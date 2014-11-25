@@ -25,17 +25,16 @@ class BranchTargetBuffer {
     private:
         long long tick;
         map<int, BTBEntry*> buffer;     // pc to BTBEntry
-        map<int, long long> lastedTickedAt;  // pc to last tick. Used to morph LRU behavior
+        map<int, long> lastedTickedAt;  // pc to last tick. Used to morph LRU behavior
 	static const int MAXSIZE = 16;	// maximum size of BTB
 	int size;	//Current size of BTB
     public:
         BranchTargetBuffer() {
         	tick = 0;
-		size = 0;
+            size = 0;
         }
 
         void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
         unsigned int getNextPC(unsigned int PC);
 };
-
 #endif

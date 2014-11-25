@@ -38,32 +38,24 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		// If BTB is full then delete the LRU entry
 		if (size == MAXSIZE) {
 			int minKey = 0;
-			map<int, long long>::iterator minIt;
 			int min = 0;
-			for (map<int, long long>::iterator it =
+			for (map<int, long>::iterator it =
 					lastedTickedAt.begin(); it != lastedTickedAt.end(); ++it) {
 				if (min == 0) {
 					min = it->second;
 					minKey = it->first;
-					minIt = it;
 				} else if (it->second < min) {
 					min = it->second;
 					minKey = it->first;
-					minIt = it;
 				}
 			}
 
 			// Erase the corresponding entry from buffer
-			for (map<int, BTBEntry*>::iterator it = buffer.begin();
-					it != buffer.end(); ++it) {
-				if (it->first == minKey) {
-					buffer.erase(it);
-					break;
-				}
-			}
+            assert (buffer.count(minKey) > 0);
+            buffer.erase(minKey);
 
 			//Erase the entry from lastedTicketedAt
-			lastedTickedAt.erase(minIt);
+			lastedTickedAt.erase(minKey);
 		} else {
 			size++;
 		}
@@ -71,5 +63,4 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		buffer[PC] = btbEntry;
 		lastedTickedAt[PC] = tick;
 	}
-
 }
