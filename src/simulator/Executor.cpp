@@ -6,7 +6,7 @@ void Executor::instFetchStage() {
     // Read memory for nextPC.
     // Add instruction to instructionQueue
     Data* data = getMemoryData(nextPC);
-    instructionQueue.push(new RawInstruction(data, executionCycle + 1));
+    instructionQueue.push(new RawInstruction(data, getExecutionCycle() + 1));
 
     // Check BTB for next address
     // update nextPC
@@ -17,6 +17,14 @@ void Executor::instFetchStage() {
 void Executor::decodeStage() {
     // Read instructionQueue. If empty do nothing
     if (instructionQueue.size() == 0) {
+        return;
+    }
+
+    // Check ROB and RS. If not empty, do nothing
+    // How to handle NOP and BREAK?
+    // Extra slot in ROB for saving address of the load and store instruction??
+    // to handle load store dependence??
+    if (rob->isFull() || resStation->isFull()) {
         return;
     }
 
@@ -31,10 +39,6 @@ void Executor::decodeStage() {
     Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
                                     rawInst->getBitString(), executionCycle + 1);
 
-    // Check ROB and RS. If not empty, do nothing
-    if (rob->isFull() || resStation->isFull()) {
-        return;
-    }
 
     // Else add to ROB. Update instruction with ROB address for returned value.
     ROBSlot* slotEntry = rob->queueInstruction(instruction);

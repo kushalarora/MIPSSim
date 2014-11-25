@@ -18,11 +18,12 @@ class Executor : public Simulator {
 
         unsigned int nextPC;
 
+        // SW address to count mapping.
         map<unsigned int, int> SWAddToCount;
 
         static unsigned int executionCycle;
 
-        void flush();
+        void flush();   // to flush all hardware on wrong branch prediction.
     public:
         void instFetchStage();
         void decodeStage();
