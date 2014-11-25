@@ -1,6 +1,9 @@
 #include "../instructions/Instruction.h"
-#include<vector>
-#include<cassert>
+#include <vector>
+#include <cassert>
+#include <climits>
+#include "../pipeline/CDB.h"
+#include <map>
 
 using namespace std;
 
@@ -9,6 +12,7 @@ using namespace std;
 // Reservation station entry
 class RSEntry {
     private:
+
         int RSId;      // RS Entry ID
         Instruction* instruction;   // Instruction Reference
         int Vj;     // Value of 1st argument
@@ -16,14 +20,30 @@ class RSEntry {
         int Qj;     // ROBId for ROB entry of dependent instruction for 1st argument, 0 is Vj present
         int Qk;     // ROBID for ROB entry of dependent instruction for 2nd argument, O if Vk present;
         unsigned int A;
+
     public:
+        const static int DEFAULT_VALUE = INT_MIN;
+        const static int DEFAULT_Q = 0;
         int getRSId() { return RSId;}
         Instruction* getInstruction() { return instruction; }
+        
         int getVj() { return Vj; }
+        void setVj(int Vj) { this->Vj = Vj; }
+
         int getVk() { return Vk; }
+        void setVk(int Vk) { this->Vk = Vk; }
+
         int getQj() { return Qj; }
+        void resetQj() { this->Qj = DEFAULT_VALUE; }
+
         int getQk() { return Qk; }
+        void resetQk() { this->Qk = DEFAULT_VALUE; }
+
         int getAddress() { return A; }
+        void setAddress(unsigned address) { 
+            this->A = address;
+        }
+
         RSEntry(int index, Instruction* instruction);
 };
 
@@ -31,15 +51,29 @@ class RSEntry {
 // station entries for each execution unit.
 class ReservationStation {
     private:
+
         vector<RSEntry*> reservations;
         int index;
+        CDB* cdb;
+        map<unsigned int, int>& SWAddToCount;
+
     public:
         static const int MAX_SIZE = 10;
+
         bool isFull() {reservations.size() == MAX_SIZE;}
+
         RSEntry* add(Instruction* instruction);
+
         void remove(int RSId);
+
         void flush() { reservations.clear(); }
-        ReservationStation() {
+
+        void updateFromCDB();
+        
+        void updateAddForLDSW();
+
+        ReservationStation(CDB* cdb, map<unsigned int, int>& SWAddToCount)
+            : SWAddToCount(SWAddToCount) {
             index = 0;
         }
 };

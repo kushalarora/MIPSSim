@@ -3,6 +3,8 @@
 #include<cassert>
 #include<climits>
 #include "../instructions/Instruction.h"
+#include "CDB.h"
+#include "RegisterStatus.h"
 using namespace std;
 
 #ifndef __MIPS_ROB__
@@ -17,26 +19,19 @@ class ROBSlot {
         int value;
 
     public:
-        // TODO:: Add Constructor
         int getIndex() { return index; }
+
         bool isReady() { return ready; }
+        bool makeReady() { ready = true; }
+
         Instruction* getInstruction() { return instruction; }
+
         int getDestination() { return destination; }
+
         int getValue() { return value; }
-        void setValue() { this->value = value;}
+        void setValue(int value) { this->value = value;}
 
-        ROBSlot(int index, Instruction* instruction) {
-           ready = false;
-           this->instruction  = instruction;
-
-           // determine destination
-           // TODO::Incomplete
-           INSTRUCTIONS opCode = instruction->getOpCode();
-           if (opCode == SW) {
-                destination = -1;
-           }
-           value = INT_MIN;
-        }
+        ROBSlot(int index, Instruction* instruction);
 };
 
 
@@ -44,17 +39,27 @@ class ROB {
     private:
         deque<ROBSlot*> robQueue;
         int index;  // index starts at 1.
+        CDB* cdb;
+        RegisterStatus* registerStatus;
+
     public:
         static const int MAXSIZE = 6;
+
         bool isFull() { return robQueue.size() == MAXSIZE; }
+
         ROBSlot* queueInstruction(Instruction* instruction);
+
         ROBSlot* dequeueInstruction();
+
         ROBSlot* peekTop() { return robQueue.front(); }
+
         void flush() { robQueue.clear(); }
 
-        ROB() {
+        ROB(CDB* cdb, RegisterStatus* registerStatus)
+            : cdb(cdb), registerStatus(registerStatus) {
             index = 0;
         }
-};
 
+        void updateFromCDB();
+};
 #endif

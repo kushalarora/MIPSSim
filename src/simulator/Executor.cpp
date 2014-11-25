@@ -1,4 +1,7 @@
 #include "Executor.h"
+
+unsigned int Executor::executionCycle = 0;
+
 void Executor::instFetchStage() {
     // Read memory for nextPC.
     // Add instruction to instructionQueue
@@ -7,7 +10,7 @@ void Executor::instFetchStage() {
 
     // Check BTB for next address
     // update nextPC
-    nextPC = btb.getNextPC(nextPC);
+    nextPC = btb->getNextPC(nextPC);
 }
 
 
@@ -29,16 +32,16 @@ void Executor::decodeStage() {
                                     rawInst->getBitString(), executionCycle + 1);
 
     // Check ROB and RS. If not empty, do nothing
-    if (rob.isFull() || resStation.isFull()) {
+    if (rob->isFull() || resStation->isFull()) {
         return;
     }
 
     // Else add to ROB. Update instruction with ROB address for returned value.
-    ROBSlot* slotEntry = rob.queueInstruction(instruction);
+    ROBSlot* slotEntry = rob->queueInstruction(instruction);
     instruction->setROBSlot(slotEntry);
 
     // Add entry to RS. Update arguments from register or ROB. (Qj, Qk,Vj, Vk)
-    RSEntry* rsEntry = resStation.add(instruction);
+    RSEntry* rsEntry = resStation->add(instruction);
     instruction->setRSId(rsEntry->getRSId());
 }
 
@@ -80,17 +83,26 @@ void Executor::executeStage() {
 
 
 void Executor::writeResultStage() {
-    // When result available in CDB and from there to ROB and RS.
-    // Store, Branch. NOP and BREAK will skip this step.
-    // This step also update values in ROB and make ROB instruction ready to commit.
+    // When result available in CDB
+    //      update ROB
+    //      make ROB instruction ready to commit in next cycle.
+    rob->updateFromCDB();
 
-    /* Figure out handling of load and store in write result stage */
+    //      update RS.
+    //  If Load or store, do the following
+    //  Update the ROBSlot with destination.
+    //  Update RS with the caculated address
+    //  RS also updates SWAddToCount map to handle load stall.
+    resStation->updateFromCDB();
+
+    // Flush CDB at the end of this cycle
+    cdb->flush();
 }
 
 
 void Executor::commitStage() {
     // Commit is in order. One instruction from top of the queue.
-    ROBSlot* slot = rob.dequeueInstruction();
+    ROBSlot* slot = rob->dequeueInstruction();
     Instruction* inst = slot->getInstruction();
 
     unsigned int destination = slot->getDestination();
@@ -104,7 +116,7 @@ void Executor::commitStage() {
     if (opCode == J || inst->isBranchInst()) {
         // check the ROB's next instruction's address
         // is same as destination
-        ROBSlot* nextSlot = rob.peekTop();
+        ROBSlot* nextSlot = rob->peekTop();
         Instruction* nextInst = nextSlot->getInstruction();
 
         // if not same,
@@ -129,7 +141,7 @@ void Executor::commitStage() {
     // finally vacate the reservation station.
     int RSId = inst->getRSId();
     assert(RSId > -1);
-    resStation.remove(RSId);
+    resStation->remove(RSId);
 }
 
 void Executor::run() {
@@ -147,8 +159,8 @@ void Executor::run() {
 }
 
 void Executor::flush() {
-    rob.flush();
-    resStation.flush();
-    regStatus.flush();
-    cdb.flush();
+    rob->flush();
+    resStation->flush();
+    regStatus->flush();
+    cdb->flush();
 }

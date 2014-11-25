@@ -21,3 +21,8 @@ void CDB::clear(int ROBId) {
 void CDB::flush() {
     ROBIdToValueMap.clear();
 }
+
+bool CDB::isPopulated(int ROBId) {
+    return ROBIdToValueMap.count(ROBId) > 0 && 
+                ROBIdToValueMap[ROBId] != DEFAULT_VALUE;
+}

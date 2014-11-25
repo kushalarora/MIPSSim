@@ -55,6 +55,7 @@ class Instruction {
         void setRSId(int RSId) { this->RSId = RSId; }
 
         unsigned int getExecutionCycle() { return executionCycle; }
+        void setExecutionCycle(unsigned int executionCycle) { this->executionCycle = executionCycle; }
 
         bool isBranchInst() { return isBranch; }
 

@@ -15,6 +15,7 @@ class CDB {
         void set(int ROBId, int value);  // set value for ROBId
         void clear(int ROBId);   // clear map for ROBId
         void flush();
+        bool isPopulated(int ROBId); 
 
     private:
         map<int, int> ROBIdToValueMap;  // map for ROB id to value
