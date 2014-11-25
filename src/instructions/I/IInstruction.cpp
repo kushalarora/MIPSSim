@@ -18,7 +18,21 @@ class IInstruction : public Instruction {
             immediate = fromTwosComplement(toInt(bitString.substr(16, 16)), 16);
 
             setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
+
+            INSTRUCTIONS opcode = getOpCode();
+            if (opcode == BEQ || opcode == BNE ||
+                opcode == BGTZ || opcode == BLEZ || opcode == BLTZ) {
+                isBranch = true;
+            }
+
         }
+
+        unsigned int getDestination() {
+            return (isBranch ?
+                        getAddress() + immediate * 4 :
+                        registerT);
+        }
+
         string instructionString() {
             stringstream ss;
             ss << OpCodeStrings[getOpCode()] << " ";

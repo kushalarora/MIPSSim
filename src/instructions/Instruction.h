@@ -5,37 +5,60 @@
 #include<map>
 
 
+
+
 #ifndef __MIPSSIM_INSTRUCTION__
 #define __MIPSSIM_INSTRUCTION__
+
 using namespace std;
+
+class ROBSlot;
 class Instruction {
     private:
         INSTRUCTIONS opcode;
         int address;
         string bitString;
-        unsigned int ROBId;
+        ROBSlot* robSlot;
+        unsigned int RSId;
         unsigned int executionCycle;
     public:
         Instruction(int address, string bitString) {
             this->address = address;
             this->bitString = bitString;
             executionCycle = -1;
+            isBranch = false;
+            robSlot = NULL;
+            RSId = -1;
         }
 
         Instruction(unsigned int address, string bitString, unsigned int executionCycle) {
             this->address = address;
             this->bitString = bitString;
             this->executionCycle = executionCycle;
+            isBranch = false;
+            robSlot = NULL;
+            RSId = -1;
         }
 
         virtual string instructionString() = 0;
 
         INSTRUCTIONS getOpCode() { return opcode;}
+
         string getBitString() { return bitString;}
 
-        unsigned int getROBId() { return ROBId; }
-        void setROBId(unsigned int ROBId) { this->ROBId = ROBId; }
+        unsigned int getAddress() { return address; }
+
+        ROBSlot* getROBSlot() { return robSlot; }
+        void setROBSlot(ROBSlot* robSlot) { this->robSlot = robSlot; }
+
+        int getRSId() { return RSId; }
+        void setRSId(int RSId) { this->RSId = RSId; }
+
         unsigned int getExecutionCycle() { return executionCycle; }
+
+        bool isBranchInst() { return isBranch; }
+
+        virtual unsigned int getDestination() = 0;
 
         string toString() {
             stringstream ss;
@@ -50,7 +73,7 @@ class Instruction {
 
     protected:
         void setOpCode(INSTRUCTIONS opcode) { this->opcode = opcode;}
-
+        bool isBranch;
 };
 
 #endif

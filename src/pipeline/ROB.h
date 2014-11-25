@@ -1,7 +1,8 @@
-#include<queue>
-#include "../instructions/Instruction.h"
+#include<deque>
+#include "../commons.h"
 #include<cassert>
 #include<climits>
+#include "../instructions/Instruction.h"
 using namespace std;
 
 #ifndef __MIPS_ROB__
@@ -30,7 +31,8 @@ class ROBSlot {
 
            // determine destination
            // TODO::Incomplete
-           if (instruction->getOpCode() == SW) {
+           INSTRUCTIONS opCode = instruction->getOpCode();
+           if (opCode == SW) {
                 destination = -1;
            }
            value = INT_MIN;
@@ -40,13 +42,15 @@ class ROBSlot {
 
 class ROB {
     private:
-        queue<ROBSlot*> robQueue;
+        deque<ROBSlot*> robQueue;
         int index;  // index starts at 1.
     public:
         static const int MAXSIZE = 6;
         bool isFull() { return robQueue.size() == MAXSIZE; }
         ROBSlot* queueInstruction(Instruction* instruction);
         ROBSlot* dequeueInstruction();
+        ROBSlot* peekTop() { return robQueue.front(); }
+        void flush() { robQueue.clear(); }
 
         ROB() {
             index = 0;

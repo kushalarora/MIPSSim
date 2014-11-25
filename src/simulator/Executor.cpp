@@ -19,24 +19,27 @@ void Executor::decodeStage() {
 
     RawInstruction* rawInst = instructionQueue.front();
 
-    // If front most inst not scheduled for this cycle, then do nothing
+    // If front most inst scheduled for future cycle, then do nothing
     if (rawInst->getDecodeCycle() > executionCycle) {
         return;
     }
 
     // Else decode Instruction using instructionBuilder.
-    Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(), rawInst->getBitString(), executionCycle + 1);
+    Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
+                                    rawInst->getBitString(), executionCycle + 1);
 
     // Check ROB and RS. If not empty, do nothing
     if (rob.isFull() || resStation.isFull()) {
         return;
     }
+
     // Else add to ROB. Update instruction with ROB address for returned value.
     ROBSlot* slotEntry = rob.queueInstruction(instruction);
-    instruction->setROBId(slotEntry->getIndex());
+    instruction->setROBSlot(slotEntry);
 
     // Add entry to RS. Update arguments from register or ROB. (Qj, Qk,Vj, Vk)
-    resStation.add(instruction);
+    RSEntry* rsEntry = resStation.add(instruction);
+    instruction->setRSId(rsEntry->getRSId());
 }
 
 
@@ -77,7 +80,7 @@ void Executor::executeStage() {
 
 
 void Executor::writeResultStage() {
-    // When result available, write it into CDB and from there to ROB and RS.
+    // When result available in CDB and from there to ROB and RS.
     // Store, Branch. NOP and BREAK will skip this step.
     // This step also update values in ROB and make ROB instruction ready to commit.
 
@@ -87,17 +90,46 @@ void Executor::writeResultStage() {
 
 void Executor::commitStage() {
     // Commit is in order. One instruction from top of the queue.
-    //
-    // For ALU instruction, register is updated with the result and instruction removed from ROB and RS.
-    // Load commit is same.
-    // Store updates memory. Any dependent load is wakened up and does memory access in next cycle.
+    ROBSlot* slot = rob.dequeueInstruction();
+    Instruction* inst = slot->getInstruction();
 
+    unsigned int destination = slot->getDestination();
+    INSTRUCTIONS opCode = inst->getOpCode();
 
     // Branching:
     //      If predicted correctly, commit and remove from ROB and RS
     //      If wrongly predicted, update PC accordingly and clear all instruction after that stage. Commit branche and remove branch from ROB and RS.
     //      For jump same, if not present in BTB, update BTB and discard all following instructions.
     //      PC to be updated will be nextPC.
+    if (opCode == J || inst->isBranchInst()) {
+        // check the ROB's next instruction's address
+        // is same as destination
+        ROBSlot* nextSlot = rob.peekTop();
+        Instruction* nextInst = nextSlot->getInstruction();
+
+        // if not same,
+        if (destination != nextInst->getAddress()) {
+            // then flush the whole system
+            // (ROB, RS, IQ, Register Status)
+            flush();
+
+            // and update nextPC;
+            nextPC = destination;
+        }
+
+    } else if (opCode == SW) {
+        // update destination memory with value
+        memory[destination] = new Data(destination, slot->getValue());
+
+    } else {
+        // For ALU  and load instruction, register is updated with the result
+        regstr[destination] = slot->getValue();
+    }
+
+    // finally vacate the reservation station.
+    int RSId = inst->getRSId();
+    assert(RSId > -1);
+    resStation.remove(RSId);
 }
 
 void Executor::run() {
@@ -114,3 +146,9 @@ void Executor::run() {
     }
 }
 
+void Executor::flush() {
+    rob.flush();
+    resStation.flush();
+    regStatus.flush();
+    cdb.flush();
+}

@@ -29,6 +29,8 @@ class RInstruction : public Instruction {
             }
 
         }
+        
+        unsigned int getDestination() { return registerD; }
 
         virtual string instructionString() {
             if (getOpCode() == NOP || getOpCode() == BREAK) {

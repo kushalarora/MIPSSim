@@ -9,7 +9,7 @@ using namespace std;
 // Reservation station entry
 class RSEntry {
     private:
-        int index;      // RS Entry ID
+        int RSId;      // RS Entry ID
         Instruction* instruction;   // Instruction Reference
         int Vj;     // Value of 1st argument
         int Vk;     // Value of 2nd argument
@@ -17,7 +17,7 @@ class RSEntry {
         int Qk;     // ROBID for ROB entry of dependent instruction for 2nd argument, O if Vk present;
         unsigned int A;
     public:
-        int getIndex() { return index;}
+        int getRSId() { return RSId;}
         Instruction* getInstruction() { return instruction; }
         int getVj() { return Vj; }
         int getVk() { return Vk; }
@@ -32,10 +32,15 @@ class RSEntry {
 class ReservationStation {
     private:
         vector<RSEntry*> reservations;
+        int index;
     public:
         static const int MAX_SIZE = 10;
         bool isFull() {reservations.size() == MAX_SIZE;}
         RSEntry* add(Instruction* instruction);
-        void remove(int index);
+        void remove(int RSId);
+        void flush() { reservations.clear(); }
+        ReservationStation() {
+            index = 0;
+        }
 };
 #endif

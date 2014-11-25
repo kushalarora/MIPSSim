@@ -1,10 +1,9 @@
 #include "ROB.h"
 
 ROBSlot* ROB::queueInstruction(Instruction* instruction) {
-    index++;
     assert (robQueue.size() < MAXSIZE);
-    ROBSlot* robSlot = new ROBSlot(index, instruction);
-    robQueue.push(robSlot);
+    ROBSlot* robSlot = new ROBSlot(++index, instruction);
+    robQueue.push_back(robSlot);
     return robSlot;
 }
 
@@ -14,6 +13,6 @@ ROBSlot* ROB::dequeueInstruction() {
         return NULL;
     }
     ROBSlot* entry = robQueue.front();
-    robQueue.pop();
+    robQueue.pop_front();
     return entry;
 }

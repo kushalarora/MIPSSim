@@ -5,7 +5,7 @@ SOURCE_FILES=src/MIPSSim.cpp src/commons.cpp \
 		 src/simulator/SimulatorBuilder.cpp src/simulator/Executor.cpp \
 		src/instructions/InstructionBuilder.cpp src/instructions/I/IInstruction.cpp \
 		src/instructions/R/RInstruction.cpp src/instructions/J/JInstruction.cpp src/instructions/OpcodeMap.cpp	\
-		src/pipeline/ROB.cpp src/pipeline/ReservationStation.cpp src/pipeline/BTB.cpp
+		src/pipeline/ROB.cpp src/pipeline/ReservationStation.cpp src/pipeline/BTB.cpp src/pipeline/CDB.cpp
 OBJECT_FILES = $(SOURCE_FILES:.cpp=.o)
 EXECUTABLE = target/MIPSSim
 

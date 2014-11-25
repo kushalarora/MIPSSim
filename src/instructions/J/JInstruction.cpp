@@ -7,17 +7,21 @@ using namespace std;
 #define __MIPS_JINST__
 class JInstruction : public Instruction  {
     private:
-        int address;
+        int jumpAddress;
     public:
         JInstruction(int lineNo, string bitString, unsigned int executionCycle) : Instruction(lineNo, bitString, executionCycle) {
-            address = toInt(bitString.substr(6, 26)) * 4;
+            jumpAddress = toInt(bitString.substr(6, 26)) * 4;
 
             setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
         }
 
+        unsigned int getDestination() { 
+            return (getAddress() & 0xF0000000) + jumpAddress;
+        }
+
         string instructionString() {
             stringstream ss;
-            ss << OpCodeStrings[getOpCode()] << " #" << address;
+            ss << OpCodeStrings[getOpCode()] << " #" << jumpAddress;
             return ss.str();
         }
 };

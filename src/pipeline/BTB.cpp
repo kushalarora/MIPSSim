@@ -6,7 +6,7 @@ unsigned int BranchTargetBuffer::getNextPC(unsigned int PC) {
 	assert(PC >= BASE_PC);
 	unsigned int nextPC = PC + 4;
 
-	tick++; // Update the tick to keep track of current cycle	
+	tick++; // Update the tick to keep track of current cycle
 
 	if (buffer.count(PC) > 0) {
 		BTBEntry* btbEntry = buffer.at(PC);
@@ -38,10 +38,10 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		// If BTB is full then delete the LRU entry
 		if (size == MAXSIZE) {
 			int minKey = 0;
-			map<int, long long>::const_iterator minIt;
+			map<int, long long>::iterator minIt;
 			int min = 0;
-			for (map<int, long long>::const_iterator it =
-					lastedTickedAt.cbegin(); it != lastedTickedAt.end(); ++it) {
+			for (map<int, long long>::iterator it =
+					lastedTickedAt.begin(); it != lastedTickedAt.end(); ++it) {
 				if (min == 0) {
 					min = it->second;
 					minKey = it->first;
@@ -54,8 +54,8 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 			}
 
 			// Erase the corresponding entry from buffer
-			for (map<int, BTBEntry*>::const_iterator it = buffer.cbegin();
-					it != buffer.cend(); ++it) {
+			for (map<int, BTBEntry*>::iterator it = buffer.begin();
+					it != buffer.end(); ++it) {
 				if (it->first == minKey) {
 					buffer.erase(it);
 					break;
