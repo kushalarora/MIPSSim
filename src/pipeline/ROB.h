@@ -47,9 +47,13 @@ class ROB {
 
         bool isFull() { return robQueue.size() == MAXSIZE; }
 
+
+
         ROBSlot* queueInstruction(Instruction* instruction);
 
         ROBSlot* dequeueInstruction();
+
+        bool isEmpty() { return robQueue.size() == 0; }
 
         ROBSlot* peekTop() { return robQueue.front(); }
 

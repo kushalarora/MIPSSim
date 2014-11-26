@@ -44,6 +44,10 @@ class RSEntry {
         void setAddress(unsigned address) { 
             this->A = address;
         }
+        
+        bool isReady() { 
+            return Qj == DEFAULT_Q && Qk == DEFAULT_Q;
+        }
 
         RSEntry(int RSId, Instruction* instruction, int Vj, int Vk, int Qj, int Qk, unsigned int A);
 };

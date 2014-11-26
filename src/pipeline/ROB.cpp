@@ -36,6 +36,14 @@ void ROB::updateFromCDB() {
 
        ROBSlot* slot = *it;
        unsigned int ROBId = slot->getIndex();
+        
+       Instruction* inst = slot->getInstruction();
+       int executionCycle = Executor::getExecutionCycle();
+
+       // If scheduled for future cycles, ignore.
+       if (inst->getExecutionCycle() > executionCycle) {
+           continue;
+       }
 
        // If ROBId in cdb.
        // Update value and make it ready for commit
@@ -44,9 +52,8 @@ void ROB::updateFromCDB() {
        int value = cdb->get(ROBId);
        if (value != CDB::DEFAULT_VALUE) {
             slot->setValue(value);
+            inst->setExecutionCycle(executionCycle + 1);
             slot->makeReady();
-            (slot->getInstruction())->setExecutionCycle(
-                    Executor::getExecutionCycle() + 1);
        }
    }
 }

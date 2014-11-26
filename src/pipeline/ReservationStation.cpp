@@ -111,6 +111,7 @@ void ReservationStation::updateFromCDB() {
     for (vector<RSEntry*>::iterator it = reservations.begin();
             it != reservations.end(); it++) {
         RSEntry* entry = *it;
+
         // Check Qj and Qk for each one of them
         // If not zero, check CDB
         // If value found, update corresponding V entry
