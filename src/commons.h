@@ -6,44 +6,53 @@
 #ifndef __MIPSSIM_COMMONS__
 #define __MIPSSIM_COMMONS__
 using namespace std;
-enum Operation {DIS, SIM};
+enum Operation {
+	DIS, SIM
+};
 
 const unsigned int BASE_PC = 600;
 
 enum INSTRUCTION_TYPE {
-    ITYPE, RTYPE, JTYPE
+	ITYPE, RTYPE, JTYPE
 };
 
 enum INSTRUCTIONS {
-    SW, LW,
-    J, BEQ, BNE, BGEZ, BGTZ, BLEZ, BLTZ,
-    ADDI, ADDIU,
-    BREAK,
-    SLT, SLTI, SLTU,
-    SLL, SRL, SRA,
-    SUB, SUBU, ADD, ADDU,
-    AND, OR, XOR, NOR,
-    NOP
+	SW,
+	LW,
+	J,
+	BEQ,
+	BNE,
+	BGEZ,
+	BGTZ,
+	BLEZ,
+	BLTZ,
+	ADDI,
+	ADDIU,
+	BREAK,
+	SLT,
+	SLTI,
+	SLTU,
+	SLL,
+	SRL,
+	SRA,
+	SUB,
+	SUBU,
+	ADD,
+	ADDU,
+	AND,
+	OR,
+	XOR,
+	NOR,
+	NOP
 };
 
-static const char* OpCodeStrings[] = {
-    "SW", "LW",
-    "J", "BEQ", "BNE", "BGEZ", "BGTZ", "BLEZ", "BLTZ",
-    "ADDI", "ADDIU",
-    "BREAK",
-    "SLT", "SLTI", "SLTU",
-    "SLL", "SRL", "SRA",
-    "SUB", "SUBU", "ADD", "ADDU",
-    "AND", "OR", "XOR", "NOR",
-    "NOP"
-};
-
+static const char* OpCodeStrings[] = { "SW", "LW", "J", "BEQ", "BNE", "BGEZ",
+		"BGTZ", "BLEZ", "BLTZ", "ADDI", "ADDIU", "BREAK", "SLT", "SLTI", "SLTU",
+		"SLL", "SRL", "SRA", "SUB", "SUBU", "ADD", "ADDU", "AND", "OR", "XOR",
+		"NOR", "NOP" };
 
 enum STATE {
-    ISSUE,
-    EXECUTE,
-    WRITE_RESULT,
-    COMMIT
+	ISSUE, EXECUTE, WRITE_RESULT, COMMIT
 };
 
 int toInt(string bitString);

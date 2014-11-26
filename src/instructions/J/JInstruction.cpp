@@ -5,50 +5,55 @@
 using namespace std;
 #ifndef __MIPS_JINST__
 #define __MIPS_JINST__
-class JInstruction : public Instruction  {
-    private:
-        int jumpAddress;
-    public:
-        JInstruction(int lineNo, string bitString, unsigned int executionCycle) : Instruction(lineNo, bitString, executionCycle) {
-            jumpAddress = toInt(bitString.substr(6, 26)) * 4;
+class JInstruction: public Instruction {
+private:
+	int jumpAddress;
 
-            setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
+public:
+	JInstruction(int lineNo, string bitString, unsigned int executionCycle) :
+			Instruction(lineNo, bitString, executionCycle) {
+		jumpAddress = toInt(bitString.substr(6, 26)) * 4;
 
-            hasRegisterOutput = false;
-        }
+		setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
 
-        unsigned int getDestination() {
-            return (getAddress() & 0xF0000000) + jumpAddress;
-        }
+		hasRegisterOutput = false;
+	}
 
+	int execute() {
+		return jumpAddress;
+	}
 
-        INSTRUCTION_TYPE getType() {
-            return JTYPE;
-        }
+	unsigned int getDestination() {
+		return (getAddress() & 0xF0000000) + jumpAddress;
+	}
 
-        int getArg1() {
-            assert(false);
-        }
+	INSTRUCTION_TYPE getType() {
+		return JTYPE;
+	}
 
-        unsigned int getImmediate() {
-            assert(false);
-        }
+	int getArg1() {
+		assert(false);
+	}
 
-        int getArg2() {
-            assert(false);
-        }
+	unsigned int getImmediate() {
+		assert(false);
+	}
 
-        string instructionString() {
-            stringstream ss;
-            ss << OpCodeStrings[getOpCode()] << " #" << jumpAddress;
-            return ss.str();
-        }
+	int getArg2() {
+		assert(false);
+	}
+
+	string instructionString() {
+		stringstream ss;
+		ss << OpCodeStrings[getOpCode()] << " #" << jumpAddress;
+		return ss.str();
+	}
 };
 
 /*
-int main() {
-    JInstruction instr = JInstruction(600, "00001000000000000000000010011110", -1);
-    cout << instr.toString();
-}
-*/
+ int main() {
+ JInstruction instr = JInstruction(600, "00001000000000000000000010011110", -1);
+ cout << instr.toString();
+ }
+ */
 #endif

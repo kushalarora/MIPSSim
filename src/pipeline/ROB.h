@@ -11,59 +11,78 @@ using namespace std;
 #define __MIPS_ROB__
 
 class ROBSlot {
-    private:
-        unsigned int index;
-        bool ready;
-        Instruction* instruction;
-        unsigned int destination;
-        int value;
+private:
+	unsigned int index;
+	bool ready;
+	Instruction* instruction;
+	unsigned int destination;
+	int value;
 
-    public:
-        int getIndex() { return index; }
+public:
+	int getIndex() {
+		return index;
+	}
 
-        bool isReady() { return ready; }
-        bool makeReady() { ready = true; }
+	bool isReady() {
+		return ready;
+	}
+	bool makeReady() {
+		ready = true;
+	}
 
-        Instruction* getInstruction() { return instruction; }
+	Instruction* getInstruction() {
+		return instruction;
+	}
 
-        int getDestination() { return destination; }
+	int getDestination() {
+		return destination;
+	}
 
-        int getValue() { return value; }
-        void setValue(int value) { this->value = value;}
+	int getValue() {
+		return value;
+	}
+	void setValue(int value) {
+		this->value = value;
+	}
 
-        ROBSlot(int index, Instruction* instruction);
+	ROBSlot(int index, Instruction* instruction);
 };
 
-
 class ROB {
-    private:
-        deque<ROBSlot*> robQueue;
-        int index;  // index starts at 1.
-        CDB* cdb;
-        RegisterStatus* registerStatus;
+private:
+	deque<ROBSlot*> robQueue;
+	int index;  // index starts at 1.
+	CDB* cdb;
+	RegisterStatus* registerStatus;
 
-    public:
-        static const int MAXSIZE = 6;
+public:
+	static const int MAXSIZE = 6;
 
-        bool isFull() { return robQueue.size() == MAXSIZE; }
+	bool isFull() {
+		return robQueue.size() == MAXSIZE;
+	}
 
+	ROBSlot* queueInstruction(Instruction* instruction);
 
+	ROBSlot* dequeueInstruction();
 
-        ROBSlot* queueInstruction(Instruction* instruction);
+	bool isEmpty() {
+		return robQueue.size() == 0;
+	}
 
-        ROBSlot* dequeueInstruction();
+	ROBSlot* peekTop() {
+		return robQueue.front();
+	}
 
-        bool isEmpty() { return robQueue.size() == 0; }
+	void flush() {
+		robQueue.clear();
+	}
 
-        ROBSlot* peekTop() { return robQueue.front(); }
+	ROB(CDB* cdb, RegisterStatus* registerStatus) :
+			cdb(cdb), registerStatus(registerStatus) {
+		index = 0;
+	}
 
-        void flush() { robQueue.clear(); }
-
-        ROB(CDB* cdb, RegisterStatus* registerStatus)
-            : cdb(cdb), registerStatus(registerStatus) {
-            index = 0;
-        }
-
-        void updateFromCDB();
+	void updateFromCDB();
 };
 #endif

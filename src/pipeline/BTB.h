@@ -10,31 +10,31 @@ using namespace std;
 #define __MIPS_BTB__
 
 class BTBEntry {
-    public:
-        unsigned int predictedPC;    // predicted program counter
-        bool prediction;    // prediction true = taken false = not taken
+public:
+	unsigned int predictedPC;    // predicted program counter
+	bool prediction;    // prediction true = taken false = not taken
 
-	public:
-	BTBEntry(unsigned int predictedPC, bool predicted){
+public:
+	BTBEntry(unsigned int predictedPC, bool predicted) {
 		this->predictedPC = predictedPC;
 		this->prediction = prediction;
 	}
 };
 
 class BranchTargetBuffer {
-    private:
-        long long tick;
-        map<int, BTBEntry*> buffer;     // pc to BTBEntry
-        map<int, long> lastedTickedAt;  // pc to last tick. Used to morph LRU behavior
+private:
+	long long tick;
+	map<int, BTBEntry*> buffer;     // pc to BTBEntry
+	map<int, long> lastedTickedAt; // pc to last tick. Used to morph LRU behavior
 	static const int MAXSIZE = 16;	// maximum size of BTB
 	int size;	//Current size of BTB
-    public:
-        BranchTargetBuffer() {
-        	tick = 0;
-            size = 0;
-        }
+public:
+	BranchTargetBuffer() {
+		tick = 0;
+		size = 0;
+	}
 
-        void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
-        unsigned int getNextPC(unsigned int PC);
+	void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
+	unsigned int getNextPC(unsigned int PC);
 };
 #endif

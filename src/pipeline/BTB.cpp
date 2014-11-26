@@ -39,8 +39,8 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		if (size == MAXSIZE) {
 			int minKey = 0;
 			int min = 0;
-			for (map<int, long>::iterator it =
-					lastedTickedAt.begin(); it != lastedTickedAt.end(); ++it) {
+			for (map<int, long>::iterator it = lastedTickedAt.begin();
+					it != lastedTickedAt.end(); ++it) {
 				if (min == 0) {
 					min = it->second;
 					minKey = it->first;
@@ -51,8 +51,8 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 			}
 
 			// Erase the corresponding entry from buffer
-            assert (buffer.count(minKey) > 0);
-            buffer.erase(minKey);
+			assert(buffer.count(minKey) > 0);
+			buffer.erase(minKey);
 
 			//Erase the entry from lastedTicketedAt
 			lastedTickedAt.erase(minKey);

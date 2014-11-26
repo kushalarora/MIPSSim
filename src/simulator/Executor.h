@@ -8,41 +8,45 @@
 
 #ifndef __MIPS_EXECUTOR__
 #define __MIPS_EXECUTOR__
-class Executor : public Simulator {
-    private:
-        BranchTargetBuffer* btb;
-        CDB* cdb;
-        RegisterStatus* regStatus;
-        ROB* rob;
-        ReservationStation* resStation;
+class Executor: public Simulator {
+private:
+	BranchTargetBuffer* btb;
+	CDB* cdb;
+	RegisterStatus* regStatus;
+	ROB* rob;
+	ReservationStation* resStation;
 
-        unsigned int nextPC;
+	unsigned int nextPC;
 
-        // SW address to count mapping.
-        map<unsigned int, int> SWAddToCount;
+	// SW address to count mapping.
+	map<unsigned int, int> SWAddToCount;
 
-        static unsigned int executionCycle;
+	static unsigned int executionCycle;
 
-        void flush();   // to flush all hardware on wrong branch prediction.
-    public:
-        void instFetchStage();
-        void decodeStage();
-        void executeStage();
-        void writeResultStage();
-        void commitStage();
+	void flush();   // to flush all hardware on wrong branch prediction.
+public:
+	void instFetchStage();
+	void decodeStage();
+	void executeStage();
+	void writeResultStage();
+	void commitStage();
 
-        static unsigned int getExecutionCycle() { return executionCycle; }
+	static unsigned int getExecutionCycle() {
+		return executionCycle;
+	}
 
-        Executor(char* logFileName) : Simulator(logFileName) {
-            nextPC = 600;
+	Executor(char* logFileName) :
+			Simulator(logFileName) {
+		nextPC = 600;
 
-            btb = new BranchTargetBuffer();
-            cdb = new CDB();
-            regStatus = new RegisterStatus();
-            rob = new ROB(cdb, regStatus);
-            resStation = new ReservationStation(cdb, regStatus, SWAddToCount, registers);
-        }
+		btb = new BranchTargetBuffer();
+		cdb = new CDB();
+		regStatus = new RegisterStatus();
+		rob = new ROB(cdb, regStatus);
+		resStation = new ReservationStation(cdb, regStatus, SWAddToCount,
+				registers);
+	}
 
-        void run();
+	void run();
 };
 #endif
