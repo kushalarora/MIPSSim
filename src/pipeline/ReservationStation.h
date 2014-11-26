@@ -2,7 +2,8 @@
 #include <vector>
 #include <cassert>
 #include <climits>
-#include "../pipeline/CDB.h"
+#include "CDB.h"
+#include "RegisterStatus.h"
 #include <map>
 
 using namespace std;
@@ -44,7 +45,7 @@ class RSEntry {
             this->A = address;
         }
 
-        RSEntry(int index, Instruction* instruction);
+        RSEntry(int RSId, Instruction* instruction, int Vj, int Vk, int Qj, int Qk, unsigned int A);
 };
 
 // Reservation Station. It is a collection of upto MaxSize reservation
@@ -55,7 +56,9 @@ class ReservationStation {
         vector<RSEntry*> reservations;
         int index;
         CDB* cdb;
+        RegisterStatus* regStatus;
         map<unsigned int, int>& SWAddToCount;
+        int* registers;
 
     public:
         static const int MAX_SIZE = 10;
@@ -72,9 +75,12 @@ class ReservationStation {
         
         void updateAddForLDSW();
 
-        ReservationStation(CDB* cdb, map<unsigned int, int>& SWAddToCount)
+        ReservationStation(CDB* cdb, RegisterStatus* regStatus, map<unsigned int, int>& SWAddToCount, int* registers)
             : SWAddToCount(SWAddToCount) {
             index = 0;
+            this->cdb = cdb;
+            this->registers = registers;
+            this->regStatus = regStatus;
         }
 };
 #endif

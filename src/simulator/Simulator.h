@@ -46,7 +46,7 @@ class Simulator {
     protected:
         queue<RawInstruction*> instructionQueue;
         vector<Data*> memory;
-        unsigned int regstr[32];
+        int registers[32];
         char* getLogFileName() {return logFileName;}
 };
 #endif

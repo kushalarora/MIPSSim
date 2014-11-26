@@ -13,10 +13,29 @@ class JInstruction : public Instruction  {
             jumpAddress = toInt(bitString.substr(6, 26)) * 4;
 
             setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
+
+            hasRegisterOutput = false;
         }
 
-        unsigned int getDestination() { 
+        unsigned int getDestination() {
             return (getAddress() & 0xF0000000) + jumpAddress;
+        }
+
+
+        INSTRUCTION_TYPE getType() {
+            return JTYPE;
+        }
+
+        int getArg1() {
+            assert(false);
+        }
+
+        unsigned int getImmediate() {
+            assert(false);
+        }
+
+        int getArg2() {
+            assert(false);
         }
 
         string instructionString() {

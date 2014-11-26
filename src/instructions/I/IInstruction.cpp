@@ -20,17 +20,37 @@ class IInstruction : public Instruction {
             setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
 
             INSTRUCTIONS opcode = getOpCode();
-            if (opcode == BEQ || opcode == BNE ||
+            if (opcode == BEQ || opcode == BNE || opcode == BGEZ ||
                 opcode == BGTZ || opcode == BLEZ || opcode == BLTZ) {
                 isBranch = true;
+            }
+
+            if (isBranch || opcode == SW) {
+                hasRegisterOutput = false;
             }
 
         }
 
         unsigned int getDestination() {
             return (isBranch ?
-                        getAddress() + immediate * 4 :
+                        getAddress() + immediate * 4:
                         registerT);
+        }
+
+        INSTRUCTION_TYPE getType() {
+            return ITYPE;
+        }
+
+        int getArg1() {
+            return registerS;
+        }
+
+        unsigned int getImmediate() {
+            return immediate;
+        }
+
+        int getArg2() {
+            assert(false);
         }
 
         string instructionString() {

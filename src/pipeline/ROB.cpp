@@ -2,12 +2,15 @@
 #include "../simulator/Executor.h"
 
 ROBSlot* ROB::queueInstruction(Instruction* instruction) {
+    // Verify the slot is there
     assert (robQueue.size() < MAXSIZE);
+
+    // Create the entry in ROB
     ROBSlot* robSlot = new ROBSlot(++index, instruction);
     robQueue.push_back(robSlot);
+
     return robSlot;
 }
-
 
 ROBSlot* ROB::dequeueInstruction() {
     if (robQueue.size() == 0) {

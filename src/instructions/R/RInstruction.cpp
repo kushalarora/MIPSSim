@@ -28,9 +28,31 @@ class RInstruction : public Instruction {
                 setOpCode(OpcodeMap::functionToOpCodeMap[bitString.substr(26, 32)]);
             }
 
+            INSTRUCTIONS opcode = getOpCode();
+            if (opcode == NOP || opcode == BREAK) {
+                hasRegisterOutput = false;
+            }
         }
-        
-        unsigned int getDestination() { return registerD; }
+
+        unsigned int getDestination() {
+            return registerD;
+        }
+
+        INSTRUCTION_TYPE getType() {
+            return RTYPE;
+        }
+
+        int getArg1() {
+            return registerS;
+        }
+
+        unsigned int getImmediate() {
+            assert(false);
+        }
+
+        int getArg2() {
+            return registerT;
+        }
 
         virtual string instructionString() {
             if (getOpCode() == NOP || getOpCode() == BREAK) {

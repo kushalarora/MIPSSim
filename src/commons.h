@@ -10,6 +10,10 @@ enum Operation {DIS, SIM};
 
 const unsigned int BASE_PC = 600;
 
+enum INSTRUCTION_TYPE {
+    ITYPE, RTYPE, JTYPE
+};
+
 enum INSTRUCTIONS {
     SW, LW,
     J, BEQ, BNE, BGEZ, BGTZ, BLEZ, BLTZ,

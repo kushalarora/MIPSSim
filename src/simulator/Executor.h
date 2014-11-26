@@ -40,7 +40,7 @@ class Executor : public Simulator {
             cdb = new CDB();
             regStatus = new RegisterStatus();
             rob = new ROB(cdb, regStatus);
-            resStation = new ReservationStation(cdb, SWAddToCount);
+            resStation = new ReservationStation(cdb, regStatus, SWAddToCount, registers);
         }
 
         void run();

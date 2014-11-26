@@ -20,17 +20,8 @@ void Executor::decodeStage() {
         return;
     }
 
-    // Check ROB and RS. If not empty, do nothing
-    // How to handle NOP and BREAK?
-    // Extra slot in ROB for saving address of the load and store instruction??
-    // to handle load store dependence??
-    if (rob->isFull() || resStation->isFull()) {
-        return;
-    }
-
-    RawInstruction* rawInst = instructionQueue.front();
-
     // If front most inst scheduled for future cycle, then do nothing
+    RawInstruction* rawInst = instructionQueue.front();
     if (rawInst->getDecodeCycle() > executionCycle) {
         return;
     }
@@ -39,14 +30,32 @@ void Executor::decodeStage() {
     Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
                                     rawInst->getBitString(), executionCycle + 1);
 
+    INSTRUCTIONS opCode = instruction->getOpCode();
 
-    // Else add to ROB. Update instruction with ROB address for returned value.
-    ROBSlot* slotEntry = rob->queueInstruction(instruction);
-    instruction->setROBSlot(slotEntry);
+    // Check ROB and RS. If not empty, do nothing
+    // Extra slot in ROB for saving address of the load and store instruction??
+    if (!rob->isFull() && (opCode == NOP || opCode == BREAK)) {
+        // IN NOP or BREAK and slot available in ROB, simply add
+        ROBSlot* slotEntry = rob->queueInstruction(instruction);
+        instruction->setROBSlot(slotEntry);
+    } else if (!rob->isFull() && !resStation->isFull()) {
+        // Else ensure space in both RS and ROB
+        ROBSlot* slotEntry = rob->queueInstruction(instruction);
+        instruction->setROBSlot(slotEntry);
 
-    // Add entry to RS. Update arguments from register or ROB. (Qj, Qk,Vj, Vk)
-    RSEntry* rsEntry = resStation->add(instruction);
-    instruction->setRSId(rsEntry->getRSId());
+        // Add entry to RS. Update arguments from register or ROB. (Qj, Qk,Vj, Vk)
+        RSEntry* rsEntry = resStation->add(instruction);
+        instruction->setRSId(rsEntry->getRSId());
+
+        // If inst writes to register, update ROBId in registerStatus
+        if (instruction->writesToRegister()) {
+            regStatus->set(instruction->getDestination(), slotEntry->getIndex());
+        }
+
+    } else {
+        // Else skip cycle
+        return;
+    }
 }
 
 
@@ -139,7 +148,7 @@ void Executor::commitStage() {
 
     } else {
         // For ALU  and load instruction, register is updated with the result
-        regstr[destination] = slot->getValue();
+        registers[destination] = slot->getValue();
     }
 
     // finally vacate the reservation station.

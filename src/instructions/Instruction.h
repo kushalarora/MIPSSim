@@ -29,6 +29,7 @@ class Instruction {
             isBranch = false;
             robSlot = NULL;
             RSId = -1;
+            hasRegisterOutput = true;
         }
 
         Instruction(unsigned int address, string bitString, unsigned int executionCycle) {
@@ -38,6 +39,7 @@ class Instruction {
             isBranch = false;
             robSlot = NULL;
             RSId = -1;
+            hasRegisterOutput = true;
         }
 
         virtual string instructionString() = 0;
@@ -59,6 +61,16 @@ class Instruction {
 
         bool isBranchInst() { return isBranch; }
 
+        bool writesToRegister() { return hasRegisterOutput; }
+
+        virtual int getArg1() = 0;
+
+        virtual int getArg2() = 0;
+
+        virtual unsigned int getImmediate() = 0;
+
+        virtual INSTRUCTION_TYPE getType() = 0; 
+
         virtual unsigned int getDestination() = 0;
 
         string toString() {
@@ -75,6 +87,8 @@ class Instruction {
     protected:
         void setOpCode(INSTRUCTIONS opcode) { this->opcode = opcode;}
         bool isBranch;
+        bool hasRegisterOutput;
+
 };
 
 #endif
