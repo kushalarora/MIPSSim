@@ -21,6 +21,7 @@ class Instruction {
         ROBSlot* robSlot;
         unsigned int RSId;
         unsigned int executionCycle;
+        unsigned int executeCyclesLeft;
     public:
         Instruction(int address, string bitString) {
             this->address = address;
@@ -29,7 +30,8 @@ class Instruction {
             isBranch = false;
             robSlot = NULL;
             RSId = -1;
-            hasRegisterOutput = true;
+			hasRegisterOutput = true;
+            executeCyclesLeft = 1;
         }
 
         Instruction(unsigned int address, string bitString, unsigned int executionCycle) {
@@ -39,7 +41,8 @@ class Instruction {
             isBranch = false;
             robSlot = NULL;
             RSId = -1;
-            hasRegisterOutput = true;
+			hasRegisterOutput = true;
+            executeCyclesLeft = 1;
         }
 
         virtual string instructionString() = 0;
