@@ -99,7 +99,7 @@ public:
 	static const int MAX_SIZE = 10;
 
 	bool isFull() {
-		reservations.size() == MAX_SIZE;
+		return (reservations.size() == MAX_SIZE);
 	}
 
 	RSEntry* add(Instruction* instruction);

@@ -15,7 +15,7 @@ public:
 	bool prediction;    // prediction true = taken false = not taken
 
 public:
-	BTBEntry(unsigned int predictedPC, bool predicted) {
+	BTBEntry(unsigned int predictedPC, bool prediction) {
 		this->predictedPC = predictedPC;
 		this->prediction = prediction;
 	}
