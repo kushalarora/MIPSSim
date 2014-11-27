@@ -16,6 +16,7 @@ class ROBSlot {
         bool ready;
         Instruction* instruction;
         unsigned int destination;
+        bool branchOutcome;
         int value;
 
     public:
@@ -27,6 +28,10 @@ class ROBSlot {
         Instruction* getInstruction() { return instruction; }
 
         int getDestination() { return destination; }
+        void setDestination(unsigned int destination){this->destination = destination;}
+
+        bool getBranchOutcome(){return branchOutcome;}
+        void setBranchOutcome(bool outcome){this->branchOutcome = outcome;}
 
         int getValue() { return value; }
         void setValue(int value) { this->value = value;}

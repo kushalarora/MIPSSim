@@ -48,6 +48,14 @@ private:
 		return (vj < immediate);
 	}
 
+	int executeLW(int vj, int vk) {
+		return vj + immediate;
+	}
+
+	int executeSW(int vj, int vk) {
+		return vj + immediate;
+	}
+
 public:
 	IInstruction(int lineNo, string bitString, unsigned int executionCycle) :
 			Instruction(lineNo, bitString, executionCycle) {
@@ -79,6 +87,12 @@ public:
 			break;
 		case SLTI:
 			return executeSLTI(vj, vk);
+			break;
+		case SW:
+			return executeSW(vj, vk);
+			break;
+		case LW:
+			return executeLW(vj, vk);
 			break;
 		}
 	}

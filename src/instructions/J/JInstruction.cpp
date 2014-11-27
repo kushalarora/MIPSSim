@@ -19,8 +19,12 @@ public:
 		hasRegisterOutput = false;
 	}
 
-	int execute() {
+	int execute(int vj, int vk) {
 		return jumpAddress;
+	}
+
+	bool outcome(int vj, int vk) {
+		return true;
 	}
 
 	unsigned int getDestination() {

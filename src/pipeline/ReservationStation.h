@@ -13,7 +13,7 @@ using namespace std;
 // Reservation station entry
 class RSEntry {
 private:
-
+	ROBSlot* robSlot;
 	int RSId;      // RS Entry ID
 	Instruction* instruction;   // Instruction Reference
 	int Vj;     // Value of 1st argument
@@ -65,6 +65,14 @@ public:
 	}
 	void setAddress(unsigned address) {
 		this->A = address;
+	}
+
+	ROBSlot* getROBSlot() {
+		return robSlot;
+	}
+
+	void setROBSlot(ROBSlot* robSlot) {
+		this->robSlot = robSlot;
 	}
 
 	RSEntry(int RSId, Instruction* instruction, int Vj, int Vk, int Qj, int Qk,

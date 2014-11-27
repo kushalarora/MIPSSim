@@ -127,6 +127,10 @@ public:
 		}
 	}
 
+	bool outcome(int vj, int vk){
+		return false;
+	}
+
 	unsigned int getDestination() {
 		return registerD;
 	}
