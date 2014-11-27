@@ -127,7 +127,7 @@ public:
 		}
 	}
 
-	bool outcome(int vj, int vk){
+	bool outcome(int vj, int vk) {
 		return false;
 	}
 

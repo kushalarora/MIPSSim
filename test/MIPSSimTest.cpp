@@ -8,10 +8,9 @@ TEST(MIPSSim, testIsSimulation) {
 }
 
 TEST(MIPSSim, testIsDisAssembly) {
-    Arguments input;
-    input.operation = DIS;
+	Arguments input;
+	input.operation = DIS;
 
-    EXPECT_TRUE(isDisAssembly(input));
+	EXPECT_TRUE(isDisAssembly(input));
 }
-
 

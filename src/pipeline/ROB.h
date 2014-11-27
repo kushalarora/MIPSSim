@@ -16,7 +16,7 @@ private:
 	bool ready;
 	Instruction* instruction;
 	unsigned int destination;
-    bool branchOutcome;
+	bool branchOutcome;
 	int value;
 
 public:
@@ -46,7 +46,7 @@ public:
 	bool getBranchOutcome() {
 		return branchOutcome;
 	}
-    
+
 	void setBranchOutcome(bool outcome) {
 		this->branchOutcome = outcome;
 	}
