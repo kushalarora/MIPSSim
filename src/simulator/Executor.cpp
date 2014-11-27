@@ -219,12 +219,23 @@ void Executor::writeResultStage() {
 }
 
 void Executor::commitStage() {
-// Commit is in order. One instruction from top of the queue.
-	ROBSlot* slot = rob->dequeueInstruction();
-	Instruction* inst = slot->getInstruction();
+if (rob->isEmpty()) {
+	return;
+}
 
-	unsigned int destination = slot->getDestination();
-	INSTRUCTIONS opCode = inst->getOpCode();
+// Check if commit is scheduled in this cycle
+ROBSlot* slot = rob->peekTop();
+Instruction* inst = slot->getInstruction();
+// If not scheduled in this cycle or not ready
+if (!slot->isReady() || inst->getExecutionCycle() > executionCycle) {
+	return;
+}
+
+// Commit is in order. One instruction from top of the queue.
+rob->dequeueInstruction();
+
+unsigned int destination = slot->getDestination();
+INSTRUCTIONS opCode = inst->getOpCode();
 
 // Branching:
 //      If predicted correctly, commit and remove from ROB and RS

@@ -125,7 +125,6 @@ protected:
 	}
 	bool isBranch;
 	bool hasRegisterOutput;
-
 };
 
 #endif

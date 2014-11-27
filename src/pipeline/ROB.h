@@ -11,60 +11,91 @@ using namespace std;
 #define __MIPS_ROB__
 
 class ROBSlot {
-    private:
-        unsigned int index;
-        bool ready;
-        Instruction* instruction;
-        unsigned int destination;
-        bool branchOutcome;
-        int value;
+private:
+	unsigned int index;
+	bool ready;
+	Instruction* instruction;
+	unsigned int destination;
+    bool branchOutcome;
+	int value;
 
-    public:
-        int getIndex() { return index; }
+public:
+	int getIndex() {
+		return index;
+	}
 
-        bool isReady() { return ready; }
-        bool makeReady() { ready = true; }
+	bool isReady() {
+		return ready;
+	}
+	bool makeReady() {
+		ready = true;
+	}
 
-        Instruction* getInstruction() { return instruction; }
+	Instruction* getInstruction() {
+		return instruction;
+	}
 
-        int getDestination() { return destination; }
-        void setDestination(unsigned int destination){this->destination = destination;}
+	int getDestination() {
+		return destination;
+	}
 
-        bool getBranchOutcome(){return branchOutcome;}
-        void setBranchOutcome(bool outcome){this->branchOutcome = outcome;}
+	void setDestination(unsigned int destination) {
+		this->destination = destination;
+	}
 
-        int getValue() { return value; }
-        void setValue(int value) { this->value = value;}
+	bool getBranchOutcome() {
+		return branchOutcome;
+	}
+    
+	void setBranchOutcome(bool outcome) {
+		this->branchOutcome = outcome;
+	}
 
-        ROBSlot(int index, Instruction* instruction);
+	int getValue() {
+		return value;
+	}
+	void setValue(int value) {
+		this->value = value;
+	}
+
+	ROBSlot(int index, Instruction* instruction);
 };
 
-
 class ROB {
-    private:
-        deque<ROBSlot*> robQueue;
-        int index;  // index starts at 1.
-        CDB* cdb;
-        RegisterStatus* registerStatus;
+private:
+	deque<ROBSlot*> robQueue;
+	int index;  // index starts at 1.
+	CDB* cdb;
+	RegisterStatus* registerStatus;
 
-    public:
-        static const int MAXSIZE = 6;
+public:
+	static const int MAXSIZE = 6;
 
-        bool isFull() { return robQueue.size() == MAXSIZE; }
+	bool isFull() {
+		return robQueue.size() == MAXSIZE;
+	}
 
-        ROBSlot* queueInstruction(Instruction* instruction);
+	ROBSlot* queueInstruction(Instruction* instruction);
 
-        ROBSlot* dequeueInstruction();
+	ROBSlot* dequeueInstruction();
 
-        ROBSlot* peekTop() { return robQueue.front(); }
+	bool isEmpty() {
+		return robQueue.size() == 0;
+	}
 
-        void flush() { robQueue.clear(); }
+	ROBSlot* peekTop() {
+		return robQueue.front();
+	}
 
-        ROB(CDB* cdb, RegisterStatus* registerStatus)
-            : cdb(cdb), registerStatus(registerStatus) {
-            index = 0;
-        }
+	void flush() {
+		robQueue.clear();
+	}
 
-        void updateFromCDB();
+	ROB(CDB* cdb, RegisterStatus* registerStatus) :
+			cdb(cdb), registerStatus(registerStatus) {
+		index = 0;
+	}
+
+	void updateFromCDB();
 };
 #endif
