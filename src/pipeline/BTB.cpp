@@ -11,9 +11,8 @@ unsigned int BranchTargetBuffer::getNextPC(unsigned int PC) {
 	if (buffer.count(PC) > 0) {
 		BTBEntry* btbEntry = buffer.at(PC);
 
-		if (btbEntry->prediction) {
+		if (btbEntry->taken) {
 			nextPC = btbEntry->predictedPC;
-
 		}
 
 		// Update the tick value to keep LRU behavior
@@ -31,10 +30,10 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 	if (buffer.count(PC) > 0) {
 		BTBEntry* btbEntry = buffer.at(PC);
 		btbEntry->predictedPC = nextPC;
-		btbEntry->prediction = taken;
+		btbEntry->taken = taken;
 	} else {
 		BTBEntry* btbEntry = new BTBEntry(nextPC, taken);
-
+        cout << btbEntry->taken << "   " << btbEntry->predictedPC << endl;
 		// If BTB is full then delete the LRU entry
 		if (size == MAXSIZE) {
 			int minKey = 0;

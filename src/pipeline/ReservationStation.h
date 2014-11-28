@@ -4,6 +4,7 @@
 #include <climits>
 #include "CDB.h"
 #include "RegisterStatus.h"
+#include "Registers.h"
 #include <map>
 
 using namespace std;
@@ -23,8 +24,8 @@ private:
 	unsigned int A;
 
 public:
-	const static int DEFAULT_VALUE = INT_MIN;
-	const static int DEFAULT_Q = 0;
+	const static int DEFAULT_VALUE;
+	const static int DEFAULT_Q;
 	int getRSId() {
 		return RSId;
 	}
@@ -85,7 +86,7 @@ private:
 	CDB* cdb;
 	RegisterStatus* regStatus;
 	map<unsigned int, int>& SWAddToCount;
-	int* registers;
+	Registers* registers;
 
 public:
 	static const int MAX_SIZE = 10;
@@ -110,8 +111,12 @@ public:
 		return reservations;
 	}
 
+    int size() {
+        return reservations.size();
+    }
+
 	ReservationStation(CDB* cdb, RegisterStatus* regStatus,
-			map<unsigned int, int>& SWAddToCount, int* registers) :
+			map<unsigned int, int>& SWAddToCount, Registers* registers) :
 			SWAddToCount(SWAddToCount) {
 		index = 0;
 		this->cdb = cdb;

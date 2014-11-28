@@ -21,13 +21,18 @@ public:
 	Simulator(char* logFileName) {
 		this->logFileName = logFileName;
 	}
-	void addToMemory(Data* data) {
+	
+    void addToMemory(Data* data) {
 		memory.push_back(data);
 	}
+    
+    RawInstruction* peekInstQueue() {
+        return instructionQueue.front();
+    }
 
 	Data* getMemoryData(unsigned int address) {
 		unsigned int index = getIndexFromAddress(address);
-		assert(index >= 0 || index < memory.size());
+		assert(index >= 0 && index < memory.size());
 		return memory.at(index);
 	}
 

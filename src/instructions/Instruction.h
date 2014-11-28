@@ -17,8 +17,6 @@ private:
 	string bitString;
 	ROBSlot* robSlot;
 	unsigned int RSId;
-	unsigned int executionCycle;
-	unsigned int executeCyclesLeft;
 public:
 	Instruction(int address, string bitString) {
 		this->address = address;
@@ -90,7 +88,7 @@ public:
 
 	virtual int getArg2() = 0;
 
-	virtual unsigned int getImmediate() = 0;
+	virtual int getImmediate() = 0;
 
 	virtual INSTRUCTION_TYPE getType() = 0;
 
@@ -113,6 +111,8 @@ protected:
 	}
 	bool isBranch;
 	bool hasRegisterOutput;
+	unsigned int executionCycle;
+	unsigned int executeCyclesLeft;
 
 };
 

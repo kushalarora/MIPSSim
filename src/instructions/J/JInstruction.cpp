@@ -35,7 +35,7 @@ public:
 		assert(false);
 	}
 
-	unsigned int getImmediate() {
+	int getImmediate() {
 		assert(false);
 	}
 

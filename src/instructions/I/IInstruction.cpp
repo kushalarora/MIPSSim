@@ -118,7 +118,7 @@ public:
 		return registerS;
 	}
 
-	unsigned int getImmediate() {
+	int getImmediate() {
 		return immediate;
 	}
 

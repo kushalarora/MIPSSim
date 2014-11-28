@@ -69,6 +69,7 @@ void Executor::decodeStage() {
 }
 
 void Executor::executeStage() {
+    /*
 	int aluUsed = 0;
 
 	vector<RSEntry*> reservations = resStation->getEntries();
@@ -119,6 +120,7 @@ void Executor::executeStage() {
 //              Once both available store marked ready to commit.
 
 // Reading CDB done in this stage.
+// */
 }
 
 void Executor::writeResultStage() {
@@ -184,7 +186,7 @@ if (opCode == J || inst->isBranchInst()) {
 
 } else {
 	// For ALU  and load instruction, register is updated with the result
-	registers[destination] = slot->getValue();
+	registers->set(destination, slot->getValue());
 }
 
 // finally vacate the reservation station.

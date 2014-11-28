@@ -22,7 +22,6 @@ public:
 	}
 
 	RawInstruction(Data* data, unsigned int decodeCycle) {
-		assert(decodeCycle >= BASE_PC);
 		address = data->getAddress();
 		bitString = data->getBitString();
 		this->decodeCycle = decodeCycle;

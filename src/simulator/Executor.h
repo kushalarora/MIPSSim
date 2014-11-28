@@ -3,6 +3,7 @@
 #include "../pipeline/ROB.h"
 #include "../pipeline/ReservationStation.h"
 #include "../pipeline/RegisterStatus.h"
+#include "../pipeline/Registers.h"
 #include "../pipeline/CDB.h"
 #include <map>
 
@@ -13,6 +14,7 @@ private:
 	BranchTargetBuffer* btb;
 	CDB* cdb;
 	RegisterStatus* regStatus;
+    Registers* registers;
 	ROB* rob;
 	ReservationStation* resStation;
 
@@ -31,20 +33,31 @@ public:
 	void writeResultStage();
 	void commitStage();
 
+    unsigned int getNextPC() {
+        return nextPC;
+    }
+
+    void setNextPC(unsigned int nextPC) {
+        this->nextPC = nextPC;
+    }
 	static unsigned int getExecutionCycle() {
 		return executionCycle;
 	}
 
-	Executor(char* logFileName) :
-			Simulator(logFileName) {
+    static void setExecutionCycle(unsigned int cycle) {
+        executionCycle = cycle;
+    }
+
+	Executor(char* logFileName, CDB* cdb, BranchTargetBuffer* btb, RegisterStatus* regStatus,
+            Registers* registers,  ROB* rob, ReservationStation* resStation) : Simulator(logFileName) {
 		nextPC = 600;
 
-		btb = new BranchTargetBuffer();
-		cdb = new CDB();
-		regStatus = new RegisterStatus();
-		rob = new ROB(cdb, regStatus);
-		resStation = new ReservationStation(cdb, regStatus, SWAddToCount,
-				registers);
+		this->btb = btb;
+		this->cdb = cdb;
+		this->regStatus = regStatus;
+        this->registers = registers;
+		this->rob = rob;
+		this->resStation = resStation;
 	}
 
 	void run();

@@ -139,7 +139,7 @@ public:
 		return registerS;
 	}
 
-	unsigned int getImmediate() {
+	int getImmediate() {
 		assert(false);
 	}
 

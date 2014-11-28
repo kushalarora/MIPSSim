@@ -1,5 +1,8 @@
 #include "ReservationStation.h"
 
+const int RSEntry::DEFAULT_VALUE = INT_MIN;
+const int RSEntry::DEFAULT_Q = 0;
+
 RSEntry::RSEntry(int RSId, Instruction* instruction, int Vj, int Vk, int Qj,
 		int Qk, unsigned int A) {
 	this->instruction = instruction;
@@ -21,22 +24,22 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 	// Address field to be populated.
 	INSTRUCTION_TYPE type = instruction->getType();
 	INSTRUCTIONS opCode = instruction->getOpCode();
-
+                    
 	// Update A for LOAD and STORE inst.
 	if (opCode == SW || opCode == LW) {
 		A = instruction->getImmediate();
 	}
 
 	if (type == ITYPE) {
-
 		// Read register1 value, if in Register Status,
 		// Update Q else get value from register
 		int register1 = instruction->getArg1();
 		if (regStatus->isSet(register1)) {
 			Qj = regStatus->get(register1);
 		} else {
-			Vj = registers[register1];
+			Vj = registers->get(register1);
 		}
+        
 
 		// For STORE update value to be stored as second operand
 		if (opCode == SW) {
@@ -44,7 +47,7 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 			if (regStatus->isSet(storeReg)) {
 				Qk = regStatus->get(storeReg);
 			} else {
-				Vk = registers[storeReg];
+				Vk = registers->get(storeReg);
 			}
 		}
 	} else if (type == RTYPE) {
@@ -56,14 +59,14 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		if (regStatus->isSet(register1)) {
 			Qj = regStatus->get(register1);
 		} else {
-			Vj = registers[register1];
+			Vj = registers->get(register1);
 		}
 
 		int register2 = instruction->getArg2();
 		if (regStatus->isSet(register2)) {
 			Qk = regStatus->get(register2);
 		} else {
-			Vk = registers[register2];
+			Vk = registers->get(register2);
 		}
 	} else {
 		// JUMP
@@ -119,16 +122,14 @@ void ReservationStation::updateFromCDB() {
 			int value = cdb->get(Qj);
 			if (value != CDB::DEFAULT_VALUE) {
 				entry->setVj(value);
-				entry->resetQj();
 			}
 		}
 
-		int Qk = entry->getQj();
+		int Qk = entry->getQk();
 		if (Qk != RSEntry::DEFAULT_VALUE) {
 			int value = cdb->get(Qk);
 			if (value != CDB::DEFAULT_VALUE) {
 				entry->setVk(value);
-				entry->resetQk();
 			}
 		}
 	}
