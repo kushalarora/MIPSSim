@@ -16,7 +16,7 @@ void Executor::instFetchStage() {
 	// Read memory for nextPC.
 	// Add instruction to instructionQueue
 	Data* data = getMemoryData(nextPC);
-	instructionQueue.push(new RawInstruction(data, getExecutionCycle() + 1));
+	instructionQueue.push_front(new RawInstruction(data, getExecutionCycle() + 1));
 
 	// Check BTB for next address
 	// update nextPC
@@ -34,6 +34,8 @@ void Executor::decodeStage() {
 	if (rawInst->getDecodeCycle() > executionCycle) {
 		return;
 	}
+
+    instructionQueue.pop_back();
 
 	// Else decode Instruction using instructionBuilder.
 	Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
@@ -79,7 +81,7 @@ void Executor::executeStage() {
 	for (vector<RSEntry*>::iterator it = reservations.begin(); it != reservations.end(); ++it) {
 		RSEntry* rsEntry = *it;
 		Instruction* instruction = rsEntry->getInstruction();
-       
+
         // If scheduled for future cycles, just ignore
         if (instruction->getExecutionCycle() < executionCycle) {
             continue;
@@ -91,9 +93,6 @@ void Executor::executeStage() {
         }
 
 		INSTRUCTIONS opcode = instruction->getOpCode();
-
-
-
         if (instruction->isBranchInst() || opcode == J) {
             bool outcome = instruction->outcome(rsEntry->getVj(),
                     rsEntry->getVk());
@@ -189,86 +188,54 @@ void Executor::executeStage() {
 		minLoadStoreEntry->getInstruction()->decrementExecuteCyclesLeft();
 	}
 
-// Execute if both operands available.
-// All instructions take 1 cycle.
-// Load/Store take 2. One for address computation.
-// One for memory access. That is read memory in cycle 2.
-// 10 execution units so instructions can be executed in parallel.
-
-// Branch jump resolved in this stage.
-// Save branch outcome and target in ROB and branch/jump are marked ready.
-// Update BTB with target address and 1 bit predictor.
-
-// Load and store are executed in order
-// Load's Two steps:
-//      1. Address Calculation
-//          Ensure all previous load/store have their address ready in ROB before the execution.
-//      2. Memory Access:
-//          Two cases:
-//              i. No early store in ROB on same address, go ahead and read.
-//              ii. Matched  store in ROB. Wait for store to commit and that triggers the load.
-
-// Store
-//      Two steps:
-//          1. Address Calculation
-//              When base register is ready, all load and store ahead have address ready in ROB, calculate address in 1 cycle.
-//          2. Store
-//              Happens in commit stage.
-//              Store marked ready in ROB when address and data ready.
-//              Wait in RS for AC and data computation.
-//              Once both available store marked ready to commit.
-
-// Reading CDB done in this stage.
 }
 
 void Executor::writeResultStage() {
-// When result available in CDB
-//      update ROB
-//      make ROB instruction ready to commit in next cycle.
+    // When result available in CDB
+    //      update ROB
+    //      make ROB instruction ready to commit in next cycle.
 	rob->updateFromCDB();
 
-//      update RS.
-//  If Load or store, do the following
-//  Update the ROBSlot with destination.
-//  Update RS with the caculated address
-//  RS also updates SWAddToCount map to handle load stall.
+    //  update RS.
 	resStation->updateFromCDB();
 
-// Flush CDB at the end of this cycle
+    // Flush CDB at the end of this cycle
 	cdb->flush();
 }
 
 void Executor::commitStage() {
+    // If rob empty, nothing to be done
 	if (rob->isEmpty()) {
 		return;
 	}
 
-// Check if commit is scheduled in this cycle
 	ROBSlot* slot = rob->peekTop();
 	Instruction* inst = slot->getInstruction();
-// If not scheduled in this cycle or not ready
+
+    // Check if commit is scheduled in this cycle
+    // If not scheduled in this cycle or not ready, do nothing
 	if (!slot->isReady() || inst->getExecutionCycle() > executionCycle) {
 		return;
 	}
 
-// Commit is in order. One instruction from top of the queue.
+    // Commit is in order. One instruction from top of the queue.
 	rob->dequeueInstruction();
 
 	unsigned int destination = slot->getDestination();
 	INSTRUCTIONS opCode = inst->getOpCode();
 
-// Branching:
-//      If predicted correctly, commit and remove from ROB and RS
-//      If wrongly predicted, update PC accordingly and clear all instruction after that stage. Commit branche and remove branch from ROB and RS.
-//      For jump same, if not present in BTB, update BTB and discard all following instructions.
-//      PC to be updated will be nextPC.
-	if (opCode == J || inst->isBranchInst()) {
+    if (opCode == BREAK) {
+       // If BREAK, this is the last cycle.
+       done = true;
+
+    // Branching:
+    } else if (opCode == J || inst->isBranchInst()) {
 		// check the ROB's next instruction's address
 		// is same as destination
 		ROBSlot* nextSlot = rob->peekTop();
 		Instruction* nextInst = nextSlot->getInstruction();
 
-		// if not same,
+		//  if not same,
 		if (destination != nextInst->getAddress()) {
 			// then flush the whole system
 			// (ROB, RS, IQ, Register Status)
@@ -282,12 +249,13 @@ void Executor::commitStage() {
 		// update destination memory with value
 		memory[destination] = new Data(destination, slot->getValue());
 
-} else {
-	// For ALU  and load instruction, register is updated with the result
-	registers->set(destination, slot->getValue());
-}
+    } else if (opCode != NOP) {
+        // For ALU  and load instruction,
+        // register is updated with the result
+        registers->set(destination, slot->getValue());
+    }
 
-// finally vacate the reservation station.
+    // finally vacate the reservation station.
 	int RSId = inst->getRSId();
 	assert(RSId > -1);
 	resStation->remove(RSId);
@@ -295,8 +263,7 @@ void Executor::commitStage() {
 
 void Executor::run() {
 
-// TODO: Add stop condition
-	while (true) {
+	while (!done) {
 		executionCycle++;
 
 		instFetchStage();
@@ -312,4 +279,43 @@ void Executor::flush() {
 	resStation->flush();
 	regStatus->flush();
 	cdb->flush();
+}
+
+
+string Executor::instructionQueueDump() {
+    stringstream ss;
+    ss << "IQ:" << endl;
+    for (deque<RawInstruction*>::iterator it = instructionQueue.begin();
+            it != instructionQueue.end(); it++) {
+        ss << "[";
+        ss << InstructionBuilder::build((*it)->getAddress(),
+                (*it)->getBitString());
+        ss << "]" << endl;
+    }
+    ss.str();
+}
+
+string Executor::memoryDump() {
+   int startAddress = 700;
+   stringstream ss;
+   ss << startAddress << ":";
+   for (int index = getIndexFromAddress(startAddress);
+               index < memory.size(); index++) {
+        ss << " " << memory[index];
+   }
+
+    ss << endl;
+    return ss.str();
+}
+
+
+void Executor::dumpLog() {
+    logFile.open(getLogFileName(), ofstream::app);
+    logFile << instructionQueueDump() << endl;
+    logFile << resStation->resStationDump() << endl;
+    logFile << rob->robDump() << endl;
+    logFile << btb->btbDump() << endl;
+    logFile << registers->registersDump() << endl;
+    logFile << memoryDump() << endl;
+    logFile.close();
 }

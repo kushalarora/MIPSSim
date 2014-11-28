@@ -104,7 +104,7 @@ public:
 
 	void updateFromCDB();
 
-	void updateAddForLDSW();
+    string resStationDump();
 
 	vector<RSEntry*> getEntries() {
 		return reservations;

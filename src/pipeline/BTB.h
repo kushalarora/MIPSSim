@@ -36,5 +36,7 @@ public:
 
 	void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
 	unsigned int getNextPC(unsigned int PC);
+
+    string btbDump();
 };
 #endif

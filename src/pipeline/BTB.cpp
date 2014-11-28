@@ -63,3 +63,20 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		lastedTickedAt[PC] = tick;
 	}
 }
+
+
+string BranchTargetBuffer::btbDump() {
+    stringstream ss;
+    ss << "BTB:" << endl;
+    int i = 1;
+    for (map<int, BTBEntry*>::iterator it = buffer.begin(); 
+            it != buffer.end(); it++) {
+        ss << "[" << "Entry " << i << "]:";
+
+        BTBEntry* entry = it->second;
+
+        ss << "<" << it->first << "," << entry->predictedPC<<",";
+        ss << (entry->taken ? 1 : 0) << ">" << endl;
+    }
+    return ss.str();
+}

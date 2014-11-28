@@ -25,6 +25,10 @@ private:
 
 	static unsigned int executionCycle;
 
+    bool done;
+
+    ofstream logFile;
+
 	void flush();   // to flush all hardware on wrong branch prediction.
 public:
 	void instFetchStage();
@@ -32,6 +36,9 @@ public:
 	void executeStage();
 	void writeResultStage();
 	void commitStage();
+    string instructionQueueDump();
+    string memoryDump();
+    void dumpLog();
 
     unsigned int getNextPC() {
         return nextPC;
@@ -58,6 +65,8 @@ public:
         this->registers = registers;
 		this->rob = rob;
 		this->resStation = resStation;
+
+        done = false;
 	}
 
 	void run();

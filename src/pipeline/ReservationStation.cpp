@@ -68,10 +68,7 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		} else {
 			Vk = registers->get(register2);
 		}
-	} else {
-		// JUMP
-		// TODO:: How to handle this?
-	}
+	}   // J doesn't do any lookup.
 
 	// create RS entry
 	// index is unique for each entry.
@@ -133,6 +130,18 @@ void ReservationStation::updateFromCDB() {
 			}
 		}
 	}
+}
 
-	// TODO: Figure out load store handling
+
+string ReservationStation::resStationDump() {
+    stringstream ss;
+    ss << "RS:" << endl;
+	for (vector<RSEntry*>::iterator it = reservations.begin();
+			it != reservations.end(); it++) {
+		RSEntry* entry = *it;
+        Instruction* inst = entry->getInstruction();
+        
+        ss << "[" << inst->instructionString() << "]" << endl;
+    }
+    return ss.str();
 }

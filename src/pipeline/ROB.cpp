@@ -58,4 +58,15 @@ void ROB::updateFromCDB() {
 	}
 }
 
+string ROB::robDump() {
+    stringstream ss;
+    ss << "ROB:" << endl;
+	for (deque<ROBSlot*>::iterator it = robQueue.begin();
+            it != robQueue.end(); it++) {
+		ROBSlot* slot = *it;
+		Instruction* inst = slot->getInstruction();
+        ss << "[" << inst->instructionString() << "]" << endl;
+	}
+    return ss.str();
+}
 

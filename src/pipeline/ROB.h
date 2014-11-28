@@ -88,5 +88,7 @@ public:
 	}
 
 	void updateFromCDB();
+
+    string robDump();
 };
 #endif
