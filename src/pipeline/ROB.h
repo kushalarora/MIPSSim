@@ -38,6 +38,10 @@ public:
 		return destination;
 	}
 
+	void setDestination(unsigned int destination) {
+		this->destination = destination;
+	}
+
 	int getValue() {
 		return value;
 	}

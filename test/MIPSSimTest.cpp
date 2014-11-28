@@ -6,5 +6,3 @@ TEST(MIPSSim, testReadInput) {
 TEST(MIPSSim, testIsSimulation) {
 }
 
-
-

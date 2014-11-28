@@ -84,6 +84,14 @@ public:
 		return hasRegisterOutput;
 	}
 
+	unsigned int getExecuteCyclesLeft() {
+		return executeCyclesLeft;
+	}
+
+	void decrementExecuteCyclesLeft() {
+		executeCyclesLeft--;
+	}
+
 	virtual int getArg1() = 0;
 
 	virtual int getArg2() = 0;
@@ -93,6 +101,10 @@ public:
 	virtual INSTRUCTION_TYPE getType() = 0;
 
 	virtual unsigned int getDestination() = 0;
+
+	virtual int execute(int vj, int vk) = 0;
+
+	virtual bool outcome(int vj, int vk) = 0;
 
 	string toString() {
 		stringstream ss;
@@ -113,7 +125,6 @@ protected:
 	bool hasRegisterOutput;
 	unsigned int executionCycle;
 	unsigned int executeCyclesLeft;
-
 };
 
 #endif
