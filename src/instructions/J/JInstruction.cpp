@@ -28,7 +28,7 @@ public:
 	}
 
 	unsigned int getDestination() {
-		return (getAddress() & 0xF0000000) + jumpAddress;
+		return ((getAddress() & 0xF0000000) + jumpAddress);
 	}
 
 	INSTRUCTION_TYPE getType() {

@@ -29,6 +29,8 @@ private:
 
     ofstream logFile;
 
+    int codeSegmentEnd;
+
 	void flush();   // to flush all hardware on wrong branch prediction.
 public:
 	void instFetchStage();
@@ -58,7 +60,8 @@ public:
 	Executor(char* logFileName, CDB* cdb, BranchTargetBuffer* btb, RegisterStatus* regStatus,
             Registers* registers,  ROB* rob, ReservationStation* resStation) : Simulator(logFileName) {
 		nextPC = 600;
-
+        done = false;
+        codeSegmentEnd = 712;
 		this->btb = btb;
 		this->cdb = cdb;
 		this->regStatus = regStatus;

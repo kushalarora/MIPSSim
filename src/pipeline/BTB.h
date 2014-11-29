@@ -11,13 +11,17 @@ using namespace std;
 
 class BTBEntry {
 public:
+    static const int NOT_SET;
+    static const int TAKEN;
+    static const int NOT_TAKEN;
 	unsigned int predictedPC;    // predicted program counter
-	bool taken;    // taken true = taken false = not taken
+	int outcome;    // outcome == 1 => taken, outcome == 0 => not taken,
+                    // outcome == -1 => not set
 
 public:
-	BTBEntry(unsigned int predictedPC, bool taken) {
+	BTBEntry(unsigned int predictedPC, int outcome) {
 		this->predictedPC = predictedPC;
-		this->taken = taken;
+		this->outcome = outcome;
 	}
 };
 
@@ -34,8 +38,8 @@ public:
 		size = 0;
 	}
 
-	void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
-	unsigned int getNextPC(unsigned int PC);
+	void updateOrAdd(unsigned int pc, int outcome);
+	unsigned int getNextPC(unsigned int PC, unsigned int nextPC);
 
     string btbDump();
 };

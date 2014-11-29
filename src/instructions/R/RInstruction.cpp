@@ -79,7 +79,7 @@ public:
 		if (toInt(getBitString()) == 0) {
 			setOpCode(NOP);
 		} else {
-			setOpCode(OpcodeMap::functionToOpCodeMap[bitString.substr(26, 32)]);
+			setOpCode(OpcodeMap::functionToOpCodeMap[bitString.substr(26, 6)]);
 		}
 
         if (getOpCode() == NOP || getOpCode() == BREAK) {

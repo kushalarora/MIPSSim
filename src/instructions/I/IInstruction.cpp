@@ -125,7 +125,7 @@ public:
 	}
 
 	unsigned int getDestination() {
-		return (isBranch ? getAddress() + immediate * 4 : registerT);
+		return (isBranch ? (getAddress() + immediate * 4) : registerT);
 	}
 
 	INSTRUCTION_TYPE getType() {

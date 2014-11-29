@@ -2,38 +2,33 @@
 
 #include "../commons.h"
 
-unsigned int BranchTargetBuffer::getNextPC(unsigned int PC) {
+const int BTBEntry::NOT_SET = -1;
+const int BTBEntry::NOT_TAKEN=  0;
+const int BTBEntry::TAKEN = 1;
+unsigned int BranchTargetBuffer::getNextPC(unsigned int PC, unsigned int nextPC) {
 	assert(PC >= BASE_PC);
-	unsigned int nextPC = PC + 4;
 
 	tick++; // Update the tick to keep track of current cycle
 
 	if (buffer.count(PC) > 0) {
 		BTBEntry* btbEntry = buffer.at(PC);
 
-		if (btbEntry->taken) {
+		if (btbEntry->outcome == BTBEntry::TAKEN) {
 			nextPC = btbEntry->predictedPC;
+            cout << "Predicted next PC: " <<  nextPC << endl;
+		} else {
+			// if not taken last time, increment 4
+			nextPC = PC + 4;
 		}
 
 		// Update the tick value to keep LRU behavior
 		assert(lastedTickedAt.count(PC) > 0);
 		lastedTickedAt[PC] = tick;
-	}
-	return nextPC;
-}
 
-void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
-		bool taken) {
-	assert(PC >= BASE_PC);
-	assert(nextPC >= BASE_PC);
-
-	if (buffer.count(PC) > 0) {
-		BTBEntry* btbEntry = buffer.at(PC);
-		btbEntry->predictedPC = nextPC;
-		btbEntry->taken = taken;
 	} else {
-		BTBEntry* btbEntry = new BTBEntry(nextPC, taken);
-        cout << "BTB: " << PC << "Taken: " << btbEntry->taken << " NextPC: " << btbEntry->predictedPC << endl;
+
+		BTBEntry* btbEntry = new BTBEntry(nextPC, BTBEntry::NOT_SET);
+        cout << "BTB: " << PC << "Outcome: " << btbEntry->outcome << " NextPC: " << btbEntry->predictedPC << endl;
 		// If BTB is full then delete the LRU entry
 		if (size == MAXSIZE) {
 			int minKey = 0;
@@ -61,7 +56,19 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 
 		buffer[PC] = btbEntry;
 		lastedTickedAt[PC] = tick;
-	}
+		nextPC = PC + 4;
+    }
+	return nextPC;
+}
+
+void BranchTargetBuffer::updateOrAdd(unsigned int PC,  int outcome) {
+	assert(PC >= BASE_PC);
+    assert(buffer.count(PC) > 0);
+    assert(lastedTickedAt.count(PC) > 0);
+
+
+    BTBEntry* btbEntry = buffer.at(PC);
+    btbEntry->outcome = outcome;
 }
 
 
@@ -71,12 +78,18 @@ string BranchTargetBuffer::btbDump() {
     int i = 1;
     for (map<int, BTBEntry*>::iterator it = buffer.begin();
             it != buffer.end(); it++) {
-        ss << endl << "[" << "Entry " << i << "]:";
+        ss << endl << "[" << "Entry " << i++ << "]:";
 
         BTBEntry* entry = it->second;
         // TODO::What is not set funda
         ss << "<" << it->first << "," << entry->predictedPC<<",";
-        ss << (entry->taken ? 1 : 0) << ">";
+        if (entry->outcome == BTBEntry::NOT_SET)  {
+        	ss <<"NotSet";
+        } else {
+        	ss << entry->outcome;
+        }
+        ss << ">";
+
     }
     return ss.str();
 }

@@ -15,12 +15,28 @@ unsigned int Executor::executionCycle = 0;
 void Executor::instFetchStage() {
 	// Read memory for nextPC.
 	// Add instruction to instructionQueue
+
+    if (nextPC > codeSegmentEnd) {
+        return;
+    }
+
 	Data* data = getMemoryData(nextPC);
+
+    Instruction* inst = InstructionBuilder::build(nextPC, data->getBitString());
+
+    if (inst->getOpCode() == BREAK) {
+        codeSegmentEnd = nextPC;
+    }
+
 	instructionQueue.push_back(new RawInstruction(data, getExecutionCycle() + 1));
 	cout << "	Pushed Instruction at address: " << data->getAddress()<<endl;
 	// Check BTB for next address
 	// update nextPC
-	nextPC = btb->getNextPC(nextPC);
+    if (inst->getOpCode() == J || inst->isBranchInst()) {
+        nextPC = btb->getNextPC(nextPC, inst->getDestination());
+    } else {
+        nextPC = nextPC + 4;
+    }
 }
 
 void Executor::decodeStage() {
@@ -169,8 +185,8 @@ void Executor::executeStage() {
                 unsigned int newAddress = instruction->getDestination();
 
                 //Update BTB
-                btb->updateOrAdd(instruction->getAddress(), newAddress,
-                        outcome);
+                btb->updateOrAdd(instruction->getAddress(),
+                        (outcome ? BTBEntry::TAKEN : BTBEntry::NOT_TAKEN));
 
                 //Update ROB with the destination and branch outcome
                 instruction->getROBSlot()->setDestination(newAddress);
@@ -344,7 +360,6 @@ string Executor::memoryDump() {
                index < memory.size(); index++) {
         ss << "\t" << memory[index]->getValue();
    }
-
     return ss.str();
 }
 
