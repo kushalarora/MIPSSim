@@ -66,14 +66,18 @@ public:
 		setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
 
 		INSTRUCTIONS opcode = getOpCode();
-		if (opcode == BEQ || opcode == BNE || opcode == BGTZ || opcode == BLEZ
-				|| opcode == BLTZ || opcode == BGEZ) {
+		if (opcode == BEQ || opcode == BNE || opcode == BGTZ || 
+                opcode == BLEZ || opcode == BLTZ || opcode == BGEZ) {
 			isBranch = true;
 		}
 
 		if (opcode == SW || opcode == LW) {
 			executeCyclesLeft = 2;
 		}
+
+        if (isBranch || opcode == SW) {
+            hasRegisterOutput = false;
+        }
 
 	}
 

@@ -19,6 +19,7 @@ private:
 	int value;
 
 public:
+    static const int DEFAULT_VALUE;
 	int getIndex() {
 		return index;
 	}
@@ -86,6 +87,8 @@ public:
 			cdb(cdb), registerStatus(registerStatus) {
 		index = 0;
 	}
+
+    int getValue(int ROBIdx);
 
 	void updateFromCDB();
 

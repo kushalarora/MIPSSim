@@ -1,6 +1,7 @@
 #include "ROB.h"
 #include "../simulator/Executor.h"
 
+const int ROBSlot::DEFAULT_VALUE = INT_MIN;
 ROBSlot* ROB::queueInstruction(Instruction* instruction) {
 	// Verify the slot is there
 	assert(robQueue.size() < MAXSIZE);
@@ -25,14 +26,13 @@ ROBSlot::ROBSlot(int index, Instruction* instruction) {
 	this->index = index;
 	ready = false;
 	this->instruction = instruction;
-	INSTRUCTIONS opCode = instruction->getOpCode();
 	destination = instruction->getDestination();
-	value = INT_MIN;
+	value = DEFAULT_VALUE;
 }
 
 void ROB::updateFromCDB() {
-	for (deque<ROBSlot*>::iterator it = robQueue.begin(); it != robQueue.end();
-			it++) {
+	for (deque<ROBSlot*>::iterator it = robQueue.begin(); 
+            it != robQueue.end(); it++) {
 
 		ROBSlot* slot = *it;
 		unsigned int ROBId = slot->getIndex();
@@ -44,7 +44,7 @@ void ROB::updateFromCDB() {
 		if (inst->getExecutionCycle() > executionCycle) {
 			continue;
 		}
-        
+
         // if already ready, just continue
 		if (slot->isReady()) {
 			continue;
@@ -73,5 +73,20 @@ string ROB::robDump() {
         ss << endl << "[" << inst->instructionString() << "] ";
 	}
     return ss.str();
+}
+
+
+int ROB::getValue(int ROBId) {
+    int value = ROBSlot::DEFAULT_VALUE;
+    for (deque<ROBSlot*>::iterator it = robQueue.begin();
+            it != robQueue.end(); it++) {
+        ROBSlot* slot = *it;
+        if (slot->isReady() && slot->getIndex() == ROBId) {
+            value = slot->getValue();
+            break;
+        }
+    }
+
+    return value;
 }
 

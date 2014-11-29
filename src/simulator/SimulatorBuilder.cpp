@@ -28,7 +28,7 @@ public:
             ROB* rob = new ROB(cdb, regStatus);
             map<unsigned int, int> tempMap;
             Registers* registers = new Registers();
-            ReservationStation* resStation = new ReservationStation(cdb, regStatus, tempMap, registers);
+            ReservationStation* resStation = new ReservationStation(cdb, regStatus, tempMap, registers, rob);
 
             return new Executor(outFile, cdb, btb, regStatus, registers, rob, resStation);
 		}

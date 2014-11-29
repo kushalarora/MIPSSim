@@ -40,16 +40,21 @@ void Executor::decodeStage() {
 	// Else decode Instruction using instructionBuilder.
 	Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
 			rawInst->getBitString(), executionCycle + 1);
+
 	cout << "	Decode Instruction: " << instruction->instructionString()<<endl;
+
 	INSTRUCTIONS opCode = instruction->getOpCode();
 
 	// Check ROB and RS. If not empty, do nothing
 	// Extra slot in ROB for saving address of the load and store instruction??
 	if (!rob->isFull() && (opCode == NOP || opCode == BREAK)) {
+
 		// IN NOP or BREAK and slot available in ROB, simply add
 		ROBSlot* slotEntry = rob->queueInstruction(instruction);
 		instruction->setROBSlot(slotEntry);
+
 	} else if ((!rob->isFull()) && (!resStation->isFull())) {
+
 		// Else ensure space in both RS and ROB
 		ROBSlot* slotEntry = rob->queueInstruction(instruction);
 		instruction->setROBSlot(slotEntry);
@@ -64,9 +69,6 @@ void Executor::decodeStage() {
 					slotEntry->getIndex());
 		}
 
-	} else {
-		// Else skip cycle
-		return;
 	}
 }
 
@@ -87,46 +89,30 @@ void Executor::executeStage() {
             continue;
         }
 
+		INSTRUCTIONS opcode = instruction->getOpCode();
+        unsigned int executionCyclesLeft =
+                instruction->getExecuteCyclesLeft();
+
         // If rsEntry is not ready, cannot schedule.
-        if (!rsEntry->isReady() || instruction->getExecuteCyclesLeft() == 0) {
+        if (executionCyclesLeft == 0) {
             continue;
         }
 
-		INSTRUCTIONS opcode = instruction->getOpCode();
-        if (instruction->isBranchInst() || opcode == J) {
-            bool outcome = instruction->outcome(rsEntry->getVj(),
-                    rsEntry->getVk());
-
-            cout << "	Executing Branch Or Jump Inst: " << instruction->instructionString()<<endl;
-            unsigned int newAddress = instruction->getDestination();
-
-            //Update BTB
-            btb->updateOrAdd(instruction->getAddress(), newAddress,
-                    outcome);
-
-            //Update ROB with the destination and branch outcome
-            instruction->getROBSlot()->setDestination(newAddress);
-
-            //Mark the instruction ready
-            instruction->getROBSlot()->makeReady();
-            instruction->setExecutionCycle(executionCycle + 1);
-            aluUsed++;
-
-        } else if (opcode == SW || opcode == LW) {
-            unsigned int executionCyclesLeft =
-                    instruction->getExecuteCyclesLeft();
+        if (opcode == SW || opcode == LW) {
 
             //Memory address will be calculated in the first cycle
             // Enforcing in order address computation.
             // While iterating RS, find out one with min cycles,
             // later execute the address calc for the first one.
             if (executionCyclesLeft == 2 &&     // if not started executing and
+                 rsEntry->getQj() == RSEntry::DEFAULT_Q &&
                     (!minLoadStoreEntry ||      // if first LW or SW, then its min
                         // else if scheduled before, then that is min.
                         minLoadStoreEntry->getInstruction()->getExecutionCycle()
                         < instruction->getExecutionCycle())) {
 
                     minLoadStoreEntry = rsEntry;
+
             // If one cycle left, do memory access and
             // write to cdb if LW or
             // mark ready in ROB if SW and register to be written is ready.
@@ -135,16 +121,17 @@ void Executor::executeStage() {
                     // TODO::Verify that we have to wait for both Qj and Qk to be
                     // zero for SW instruction.
                     // If so, this check not needed
-                    if (rsEntry->getQk() == 0) {
+                    if (rsEntry->getQk() == RSEntry::DEFAULT_Q) {
                         instruction->decrementExecuteCyclesLeft();
                         instruction->getROBSlot()->makeReady();
                         instruction->setExecutionCycle(executionCycle + 1);
+                        instruction->getROBSlot()->setValue(rsEntry->getVk());
+                        instruction->getROBSlot()->setDestination(rsEntry->getAddress());
                         cout << "	Executing Final write of SW Inst: " << instruction->instructionString()<<endl;
                     }
                 } else {
                     int earlyStorePresent = false;
-                    for (vector<RSEntry*>::iterator it;
-                            it != reservations.end(); ++it) {
+                    for (vector<RSEntry*>::iterator it = reservations.begin(); it != reservations.end(); ++it) {
                         RSEntry* rsEntryTemp = *it;
                         Instruction* instructionTemp =
                                 rsEntry->getInstruction();
@@ -172,18 +159,38 @@ void Executor::executeStage() {
                     }
                 }
             }
-        } else {
-            //Write the result to CDB
-        	cout << "	Executing ALU Inst: " << instruction->instructionString()<<endl;
-            cdb->set(instruction->getROBSlot()->getIndex(),
-                    instruction->execute(rsEntry->getVj(),
-                            rsEntry->getVk()));
-            instruction->setExecutionCycle(executionCycle + 1);
-            aluUsed++;
-            instruction->decrementExecuteCyclesLeft();
-        }
+        } else if (rsEntry->isReady()) {
+            if (instruction->isBranchInst() || opcode == J) {
+                bool outcome = instruction->outcome(rsEntry->getVj(),
+                        rsEntry->getVk());
 
-	}
+                cout << "	Executing Branch Or Jump Inst: " << instruction->instructionString()<<endl;
+                unsigned int newAddress = instruction->getDestination();
+
+                //Update BTB
+                btb->updateOrAdd(instruction->getAddress(), newAddress,
+                        outcome);
+
+                //Update ROB with the destination and branch outcome
+                instruction->getROBSlot()->setDestination(newAddress);
+
+                //Mark the instruction ready
+                instruction->getROBSlot()->makeReady();
+                instruction->setExecutionCycle(executionCycle + 1);
+                aluUsed++;
+
+            } else {
+                //Write the result to CDB
+                cout << "	Executing ALU Inst: " << instruction->instructionString()<<endl;
+                cdb->set(instruction->getROBSlot()->getIndex(),
+                        instruction->execute(rsEntry->getVj(),
+                                rsEntry->getVk()));
+                instruction->setExecutionCycle(executionCycle + 1);
+                aluUsed++;
+                instruction->decrementExecuteCyclesLeft();
+            }
+        }   // if (rsEntry->ready())
+	}       // for loop
 
 	// Address should be calculated for The LW\SW entry at the head of the queue.
 	if (minLoadStoreEntry) {
@@ -193,7 +200,7 @@ void Executor::executeStage() {
 						minLoadStoreEntry->getVk()));
 
 		minLoadStoreEntry->getInstruction()->decrementExecuteCyclesLeft();
-		cout << "	Executing Add translation of LW or SW Inst: " << minLoadStoreEntry->getInstruction()->getBitString()<<endl;
+		cout << "	Executing Add translation of LW or SW Inst: " << minLoadStoreEntry->getInstruction()->instructionString()<<endl;
 	}
 
 }
@@ -234,7 +241,7 @@ void Executor::commitStage() {
 
     if (opCode == BREAK) {
        // If BREAK, this is the last cycle.
-       cout << " 	Commiting BREAK" << endl;
+       cout << " 	Commiting BREAK " << inst->instructionString() << endl;
        done = true;
 
     // Branching:
@@ -244,7 +251,7 @@ void Executor::commitStage() {
 		ROBSlot* nextSlot = rob->peekTop();
 		Instruction* nextInst = nextSlot->getInstruction();
 
-		cout << " 	Commiting J OR BRANCH" << endl;
+		cout << " 	Commiting J OR BRANCH " << inst->instructionString() << endl;
 
 		//  if not same,
 		if (destination != nextInst->getAddress()) {
@@ -259,14 +266,15 @@ void Executor::commitStage() {
 
 	} else if (opCode == SW) {
 		// update destination memory with value
-		cout << " 	Commiting SW" << endl;
-		memory[destination] = new Data(destination, slot->getValue());
+		writeToMemory(destination, new Data(destination, slot->getValue()));
+		cout << " 	Commiting SW " << inst->instructionString() << "   " << destination << "==>" << getMemoryData(destination)->getValue()<< endl;
 
     } else if (opCode != NOP) {
-    	cout << " 	Commiting ALU and LW inst" << endl;
+    	cout << " 	Commiting ALU and LW inst " << inst->instructionString() << endl;
         // For ALU  and load instruction,
         // register is updated with the result
         registers->set(destination, slot->getValue());
+        regStatus->reset(destination);
     }
 
     // finally vacate the reservation station.
@@ -278,15 +286,15 @@ void Executor::commitStage() {
 void Executor::run() {
 
 	while (!done) {
-		cout << "Execution Cycle: " << executionCycle<<endl;
 		executionCycle++;
 
+		cout << "Execution Cycle: " << executionCycle<<endl;
 		instFetchStage();
 		decodeStage();
+		dumpLog();
 		executeStage();
 		writeResultStage();
 		commitStage();
-		dumpLog();
 	}
 }
 

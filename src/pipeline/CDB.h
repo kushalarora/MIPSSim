@@ -5,8 +5,14 @@
 #ifndef __MIPS_CDB__
 #define __MIPS_CDB__
 using namespace std;
-class CDB {
 
+class CDBEntry {
+public:
+    int value;
+    unsigned int executionCycle;
+};
+
+class CDB {
 public:
 	// value returned if result not in CDB
 	static const int DEFAULT_VALUE = INT_MIN;
@@ -18,6 +24,6 @@ public:
 	bool isPopulated(int ROBId);
 
 private:
-	map<int, int> ROBIdToValueMap;  // map for ROB id to value
+	map<int, CDBEntry*> ROBIdToValueMap;  // map for ROB id to value
 };
 #endif

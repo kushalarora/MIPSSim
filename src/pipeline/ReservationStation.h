@@ -4,6 +4,7 @@
 #include <climits>
 #include "CDB.h"
 #include "RegisterStatus.h"
+#include "ROB.h"
 #include "Registers.h"
 #include <map>
 
@@ -50,14 +51,14 @@ public:
 		return Qj;
 	}
 	void resetQj() {
-		this->Qj = DEFAULT_VALUE;
+		this->Qj = DEFAULT_Q;
 	}
 
 	int getQk() {
 		return Qk;
 	}
 	void resetQk() {
-		this->Qk = DEFAULT_VALUE;
+		this->Qk = DEFAULT_Q;
 	}
 
 	int getAddress() {
@@ -83,6 +84,7 @@ private:
 	vector<RSEntry*> reservations;
 	int index;
 	CDB* cdb;
+    ROB* rob;
 	RegisterStatus* regStatus;
 	map<unsigned int, int>& SWAddToCount;
 	Registers* registers;
@@ -115,12 +117,13 @@ public:
     }
 
 	ReservationStation(CDB* cdb, RegisterStatus* regStatus,
-			map<unsigned int, int>& SWAddToCount, Registers* registers) :
+			map<unsigned int, int>& SWAddToCount, Registers* registers, ROB* rob) :
 			SWAddToCount(SWAddToCount) {
 		index = 0;
 		this->cdb = cdb;
 		this->registers = registers;
 		this->regStatus = regStatus;
+        this->rob = rob;
 	}
 };
 #endif

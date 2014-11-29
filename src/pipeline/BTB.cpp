@@ -33,7 +33,7 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		btbEntry->taken = taken;
 	} else {
 		BTBEntry* btbEntry = new BTBEntry(nextPC, taken);
-        cout << btbEntry->taken << "   " << btbEntry->predictedPC << endl;
+        cout << "BTB: " << PC << "Taken: " << btbEntry->taken << " NextPC: " << btbEntry->predictedPC << endl;
 		// If BTB is full then delete the LRU entry
 		if (size == MAXSIZE) {
 			int minKey = 0;
@@ -74,7 +74,7 @@ string BranchTargetBuffer::btbDump() {
         ss << endl << "[" << "Entry " << i << "]:";
 
         BTBEntry* entry = it->second;
-
+        // TODO::What is not set funda
         ss << "<" << it->first << "," << entry->predictedPC<<",";
         ss << (entry->taken ? 1 : 0) << ">";
     }

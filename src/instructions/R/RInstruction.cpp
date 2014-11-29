@@ -81,6 +81,10 @@ public:
 		} else {
 			setOpCode(OpcodeMap::functionToOpCodeMap[bitString.substr(26, 32)]);
 		}
+
+        if (getOpCode() == NOP || getOpCode() == BREAK) {
+            hasRegisterOutput = false;
+        }
 	}
 
 	int execute(int vj, int vk) {
