@@ -148,11 +148,11 @@ void Executor::executeStage() {
                     }
                 } else {
                     int earlyStorePresent = false;
-                    for (vector<RSEntry*>::iterator it = reservations.begin(); it != reservations.end(); ++it) {
-                        RSEntry* rsEntryTemp = *it;
+                    for (vector<RSEntry*>::iterator itTemp = reservations.begin(); itTemp != reservations.end(); ++itTemp) {
+                        RSEntry* rsEntryTemp = *itTemp;
                         Instruction* instructionTemp =
-                                rsEntry->getInstruction();
-                        INSTRUCTIONS opcodeTemp = instruction->getOpCode();
+                        		rsEntryTemp->getInstruction();
+                        INSTRUCTIONS opcodeTemp = instructionTemp->getOpCode();
                         // If this RS inst is SW and is scheduled before.
                         // say early store present.
                         // TODO:: Not very correct I guess.
