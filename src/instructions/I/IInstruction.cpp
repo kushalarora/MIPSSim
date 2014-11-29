@@ -72,7 +72,7 @@ public:
 		}
 
 		if (opcode == SW || opcode == LW) {
-			executeCyclesLeft = 2;
+			setExecuteCyclesLeft(2);
 		}
 
         if (isBranch || opcode == SW) {

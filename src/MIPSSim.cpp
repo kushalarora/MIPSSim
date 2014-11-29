@@ -7,28 +7,20 @@
 #include<sstream>
 
 Arguments& readArgs(int argc, char** argv) {
-	if (argc < 4) {
+	if (argc < 3) {
 		cerr << "Not Enough Arguments(" << argc << ")";
 	}
 
 	Arguments* args = new Arguments;
 	args->inputFileName = argv[1];
 	args->outputFileName = argv[2];
-
-	string opArg(argv[3]);
-	if (opArg.compare("dis") == 0) {
-		args->operation = DIS;
-	} else if (opArg.compare("sim") == 0) {
-		args->operation = SIM;
-	} else {
-		cerr << "Illegal Operation specified";
-	}
+	args->operation = SIM; // Hard coding as this argument will not be passed from the command line
 
 	args->printAllCycle = true;
-	if (argc > 4) {
+	if (argc > 3) {
 		args->printAllCycle = false;
 
-		string range(argv[4]);
+		string range(argv[3]);
 		assert(string("-T").compare(range.substr(0, 2)));
 
 		int colPosition = range.find(":");

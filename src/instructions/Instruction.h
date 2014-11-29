@@ -88,6 +88,10 @@ public:
 		return executeCyclesLeft;
 	}
 
+	void setExecuteCyclesLeft(unsigned int executeCyclesLeft) {
+		this->executeCyclesLeft = executeCyclesLeft;
+	}
+
 	void decrementExecuteCyclesLeft() {
 		executeCyclesLeft--;
 	}
