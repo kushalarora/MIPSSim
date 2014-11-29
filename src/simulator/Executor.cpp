@@ -194,6 +194,7 @@ void Executor::executeStage() {
 
 	// Address should be calculated for The LW\SW entry at the head of the queue.
 	if (minLoadStoreEntry) {
+
 		minLoadStoreEntry->setAddress(
 				minLoadStoreEntry->getInstruction()->execute(
 						minLoadStoreEntry->getVj(),
@@ -201,6 +202,19 @@ void Executor::executeStage() {
 
 		minLoadStoreEntry->getInstruction()->decrementExecuteCyclesLeft();
 		cout << "	Executing Add translation of LW or SW Inst: " << minLoadStoreEntry->getInstruction()->instructionString()<<endl;
+
+
+        Instruction* minLWSWInst = minLoadStoreEntry->getInstruction();
+        if (minLWSWInst->getOpCode() == SW &&
+                minLoadStoreEntry->getQk() == RSEntry::DEFAULT_Q) {
+
+                cout << "	Vk available, executing Final write of SW Inst: " << minLWSWInst->instructionString()<<endl;
+                minLWSWInst->decrementExecuteCyclesLeft();
+                minLWSWInst->getROBSlot()->makeReady();
+                minLWSWInst->setExecutionCycle(executionCycle + 1);
+                minLWSWInst->getROBSlot()->setValue(minLoadStoreEntry->getVk());
+                minLWSWInst->getROBSlot()->setDestination(minLoadStoreEntry->getAddress());
+        }
 	}
 
 }

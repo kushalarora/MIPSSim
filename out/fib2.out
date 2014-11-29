@@ -171,13 +171,11 @@ Cycle <10>:
 IQ:
 [LW R2, 716(R4)] 
 RS:
-[SW R6, 716(R7)] 
 [ADDI R10, R0, #8] 
 [ADDI R3, R10, #-8] 
 [LW R1, 716(R3)] 
 [ADDI R4, R10, #-4] 
 ROB:
-[SW R6, 716(R7)] 
 [ADDI R10, R0, #8] 
 [ADDI R3, R10, #-8] 
 [LW R1, 716(R3)] 
@@ -189,18 +187,16 @@ R08:	20	0	0	0	0	0	0	0
 R16:	0	0	0	0	0	0	0	0
 R24:	0	0	0	0	0	0	0	0
 Data Segment:
-716:	1	0	0	0	0	0	0	0	0	0
+716:	1	1	0	0	0	0	0	0	0	0
 Cycle <11>:
 IQ:
 [ADD R5, R1, R2] 
 RS:
-[ADDI R10, R0, #8] 
 [ADDI R3, R10, #-8] 
 [LW R1, 716(R3)] 
 [ADDI R4, R10, #-4] 
 [LW R2, 716(R4)] 
 ROB:
-[ADDI R10, R0, #8] 
 [ADDI R3, R10, #-8] 
 [LW R1, 716(R3)] 
 [ADDI R4, R10, #-4] 
@@ -208,7 +204,7 @@ ROB:
 BTB:
 Registers:
 R00:	0	0	0	0	0	0	1	4
-R08:	20	0	0	0	0	0	0	0
+R08:	20	0	8	0	0	0	0	0
 R16:	0	0	0	0	0	0	0	0
 R24:	0	0	0	0	0	0	0	0
 Data Segment:
