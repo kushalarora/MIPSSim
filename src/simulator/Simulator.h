@@ -4,7 +4,7 @@
 #include "../instructions/RawInstruction.h"
 #include "../instructions/InstructionBuilder.cpp"
 #include<string>
-#include<queue>
+#include<deque>
 #include<vector>
 #include<fstream>
 #ifndef __MIPSSIM_SIMULATOR__
@@ -14,20 +14,22 @@ class Simulator {
 private:
 	char* logFileName;
 
-	unsigned int getIndexFromAddress(unsigned int address) {
-		return (address - BASE_PC) / 4;
-	}
 public:
 	Simulator(char* logFileName) {
 		this->logFileName = logFileName;
 	}
-	void addToMemory(Data* data) {
+	
+    void addToMemory(Data* data) {
 		memory.push_back(data);
 	}
+    
+    RawInstruction* peekInstQueue() {
+        return instructionQueue.front();
+    }
 
 	Data* getMemoryData(unsigned int address) {
 		unsigned int index = getIndexFromAddress(address);
-		assert(index >= 0 || index < memory.size());
+		assert(index >= 0 && index < memory.size());
 		return memory.at(index);
 	}
 
@@ -44,11 +46,18 @@ public:
 
 	virtual void run() = 0;
 protected:
-	queue<RawInstruction*> instructionQueue;
+	deque<RawInstruction*> instructionQueue;
 	vector<Data*> memory;
-	int registers[32];
 	char* getLogFileName() {
 		return logFileName;
+	}
+    
+    void instructionQueueFlush() {
+        instructionQueue.clear();
+    }
+
+	unsigned int getIndexFromAddress(unsigned int address) {
+		return (address - BASE_PC) / 4;
 	}
 };
 #endif

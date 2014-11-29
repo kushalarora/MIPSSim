@@ -4,6 +4,8 @@
 #include <climits>
 #include "CDB.h"
 #include "RegisterStatus.h"
+#include "ROB.h"
+#include "Registers.h"
 #include <map>
 
 using namespace std;
@@ -13,7 +15,6 @@ using namespace std;
 // Reservation station entry
 class RSEntry {
 private:
-	ROBSlot* robSlot;
 	int RSId;      // RS Entry ID
 	Instruction* instruction;   // Instruction Reference
 	int Vj;     // Value of 1st argument
@@ -23,8 +24,8 @@ private:
 	unsigned int A;
 
 public:
-	const static int DEFAULT_VALUE = INT_MIN;
-	const static int DEFAULT_Q = 0;
+	const static int DEFAULT_VALUE;
+	const static int DEFAULT_Q;
 	int getRSId() {
 		return RSId;
 	}
@@ -50,14 +51,14 @@ public:
 		return Qj;
 	}
 	void resetQj() {
-		this->Qj = DEFAULT_VALUE;
+		this->Qj = DEFAULT_Q;
 	}
 
 	int getQk() {
 		return Qk;
 	}
 	void resetQk() {
-		this->Qk = DEFAULT_VALUE;
+		this->Qk = DEFAULT_Q;
 	}
 
 	int getAddress() {
@@ -65,14 +66,6 @@ public:
 	}
 	void setAddress(unsigned address) {
 		this->A = address;
-	}
-
-	ROBSlot* getROBSlot() {
-		return robSlot;
-	}
-
-	void setROBSlot(ROBSlot* robSlot) {
-		this->robSlot = robSlot;
 	}
 
 	bool isReady() {
@@ -91,9 +84,10 @@ private:
 	vector<RSEntry*> reservations;
 	int index;
 	CDB* cdb;
+    ROB* rob;
 	RegisterStatus* regStatus;
 	map<unsigned int, int>& SWAddToCount;
-	int* registers;
+	Registers* registers;
 
 public:
 	static const int MAX_SIZE = 10;
@@ -112,19 +106,24 @@ public:
 
 	void updateFromCDB();
 
-	void updateAddForLDSW();
+    string resStationDump();
 
-	vector<RSEntry*> getEntries() {
+	vector<RSEntry*>& getEntries() {
 		return reservations;
 	}
 
+    int size() {
+        return reservations.size();
+    }
+
 	ReservationStation(CDB* cdb, RegisterStatus* regStatus,
-			map<unsigned int, int>& SWAddToCount, int* registers) :
+			map<unsigned int, int>& SWAddToCount, Registers* registers, ROB* rob) :
 			SWAddToCount(SWAddToCount) {
 		index = 0;
 		this->cdb = cdb;
 		this->registers = registers;
 		this->regStatus = regStatus;
+        this->rob = rob;
 	}
 };
 #endif

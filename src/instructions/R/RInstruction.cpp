@@ -41,11 +41,11 @@ private:
 	}
 
 	int executeADD(int vj, int vk) {
-		return vj + registerD;
+		return vj + vk;
 	}
 
 	int executeADDU(int vj, int vk) {
-		return vj + registerD;
+		return vj + vk;
 	}
 
 	int executeAND(int vj, int vk) {
@@ -81,6 +81,10 @@ public:
 		} else {
 			setOpCode(OpcodeMap::functionToOpCodeMap[bitString.substr(26, 32)]);
 		}
+
+        if (getOpCode() == NOP || getOpCode() == BREAK) {
+            hasRegisterOutput = false;
+        }
 	}
 
 	int execute(int vj, int vk) {
@@ -143,7 +147,7 @@ public:
 		return registerS;
 	}
 
-	unsigned int getImmediate() {
+	int getImmediate() {
 		assert(false);
 	}
 

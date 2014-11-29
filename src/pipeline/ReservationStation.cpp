@@ -1,7 +1,10 @@
 #include "ReservationStation.h"
+#include "../simulator/Executor.h"
+const int RSEntry::DEFAULT_VALUE = INT_MIN;
+const int RSEntry::DEFAULT_Q = 0;
 
-RSEntry::RSEntry(int RSId, Instruction* instruction, int Vj, int Vk, int Qj,
-		int Qk, unsigned int A) {
+RSEntry::RSEntry(int RSId, Instruction* instruction,
+        int Vj, int Vk, int Qj, int Qk, unsigned int A) {
 	this->instruction = instruction;
 	this->RSId = RSId;
 	this->Vj = Vj;
@@ -28,23 +31,36 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 	}
 
 	if (type == ITYPE) {
-
 		// Read register1 value, if in Register Status,
 		// Update Q else get value from register
 		int register1 = instruction->getArg1();
 		if (regStatus->isSet(register1)) {
-			Qj = regStatus->get(register1);
+			int ROBId = regStatus->get(register1);
+			int ROBValue = rob->getValue(ROBId);
+			if (ROBValue != ROBSlot::DEFAULT_VALUE) {
+				Vj = ROBValue;
+			} else {
+				Qj = ROBId;
+			}
 		} else {
-			Vj = registers[register1];
+			Vj = registers->get(register1);
 		}
 
-		// For STORE update value to be stored as second operand
-		if (opCode == SW) {
-			int storeReg = instruction->getDestination();
-			if (regStatus->isSet(storeReg)) {
-				Qk = regStatus->get(storeReg);
+
+		// For following instruction, registerT is used as 2nd argument
+		if (opCode == SW || opCode == LW ||
+                opCode == BEQ || opCode == BNE) {
+			int register2 = instruction->getArg2();
+			if (regStatus->isSet(register2)) {
+				int ROBId = regStatus->get(register2);
+				int ROBValue = rob->getValue(ROBId);
+				if (ROBValue != ROBSlot::DEFAULT_VALUE) {
+					Vk = ROBValue;
+				} else {
+					Qk = ROBId;
+				}
 			} else {
-				Vk = registers[storeReg];
+				Vk = registers->get(register2);
 			}
 		}
 	} else if (type == RTYPE) {
@@ -54,21 +70,30 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		// Update Arg1 and Arg2 to Vj/Qj and Vk/Qk
 		int register1 = instruction->getArg1();
 		if (regStatus->isSet(register1)) {
-			Qj = regStatus->get(register1);
+			int ROBId = regStatus->get(register1);
+			int ROBValue = rob->getValue(ROBId);
+			if (ROBValue != ROBSlot::DEFAULT_VALUE) {
+				Vj = ROBValue;
+			} else {
+				Qj = ROBId;
+			}
 		} else {
-			Vj = registers[register1];
+			Vj = registers->get(register1);
 		}
 
 		int register2 = instruction->getArg2();
 		if (regStatus->isSet(register2)) {
-			Qk = regStatus->get(register2);
+			int ROBId = regStatus->get(register2);
+			int ROBValue = rob->getValue(ROBId);
+			if (ROBValue != ROBSlot::DEFAULT_VALUE) {
+				Vk = ROBValue;
+			} else {
+				Qk = ROBId;
+			}
 		} else {
-			Vk = registers[register2];
+			Vk = registers->get(register2);
 		}
-	} else {
-		// JUMP
-		// TODO:: How to handle this?
-	}
+	}   // J doesn't do any lookup.
 
 	// create RS entry
 	// index is unique for each entry.
@@ -109,6 +134,12 @@ void ReservationStation::updateFromCDB() {
 	for (vector<RSEntry*>::iterator it = reservations.begin();
 			it != reservations.end(); it++) {
 		RSEntry* entry = *it;
+        // Ignore inst to be executed in future cycles.
+		Instruction* instruction = entry->getInstruction();
+		int currentExecutionCycle = Executor::getExecutionCycle();
+		if (instruction->getExecutionCycle() > currentExecutionCycle) {
+			continue;
+		}
 
 		// Check Qj and Qk for each one of them
 		// If not zero, check CDB
@@ -117,21 +148,42 @@ void ReservationStation::updateFromCDB() {
 		int Qj = entry->getQj();
 		if (Qj != RSEntry::DEFAULT_VALUE) {
 			int value = cdb->get(Qj);
+            int valueFromROB = rob->getValue(Qj);
 			if (value != CDB::DEFAULT_VALUE) {
 				entry->setVj(value);
 				entry->resetQj();
-			}
+            } else if (valueFromROB != ROBSlot::DEFAULT_VALUE) {
+                entry->setVj(valueFromROB);
+				entry->resetQj();
+		    }
 		}
 
-		int Qk = entry->getQj();
+		int Qk = entry->getQk();
 		if (Qk != RSEntry::DEFAULT_VALUE) {
 			int value = cdb->get(Qk);
+            int valueFromROB = rob->getValue(Qk);
 			if (value != CDB::DEFAULT_VALUE) {
 				entry->setVk(value);
 				entry->resetQk();
+            } else if (valueFromROB != ROBSlot::DEFAULT_VALUE) {
+                entry->setVk(valueFromROB);
+				entry->resetQk();
 			}
 		}
-	}
 
-	// TODO: Figure out load store handling
+	}
+}
+
+
+string ReservationStation::resStationDump() {
+    stringstream ss;
+    ss << "RS:";
+	for (vector<RSEntry*>::iterator it = reservations.begin();
+			it != reservations.end(); it++) {
+		RSEntry* entry = *it;
+        Instruction* inst = entry->getInstruction();
+
+        ss << endl << "[" << inst->instructionString() << "] ";
+    }
+    return ss.str();
 }

@@ -16,10 +16,10 @@ private:
 	bool ready;
 	Instruction* instruction;
 	unsigned int destination;
-	bool branchOutcome;
 	int value;
 
 public:
+    static const int DEFAULT_VALUE;
 	int getIndex() {
 		return index;
 	}
@@ -41,14 +41,6 @@ public:
 
 	void setDestination(unsigned int destination) {
 		this->destination = destination;
-	}
-
-	bool getBranchOutcome() {
-		return branchOutcome;
-	}
-
-	void setBranchOutcome(bool outcome) {
-		this->branchOutcome = outcome;
 	}
 
 	int getValue() {
@@ -96,6 +88,10 @@ public:
 		index = 0;
 	}
 
+    int getValue(int ROBIdx);
+
 	void updateFromCDB();
+
+    string robDump();
 };
 #endif

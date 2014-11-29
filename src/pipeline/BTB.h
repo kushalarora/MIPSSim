@@ -12,12 +12,12 @@ using namespace std;
 class BTBEntry {
 public:
 	unsigned int predictedPC;    // predicted program counter
-	bool prediction;    // prediction true = taken false = not taken
+	bool taken;    // taken true = taken false = not taken
 
 public:
-	BTBEntry(unsigned int predictedPC, bool prediction) {
+	BTBEntry(unsigned int predictedPC, bool taken) {
 		this->predictedPC = predictedPC;
-		this->prediction = prediction;
+		this->taken = taken;
 	}
 };
 
@@ -36,5 +36,7 @@ public:
 
 	void updateOrAdd(unsigned int pc, unsigned int nextPC, bool taken);
 	unsigned int getNextPC(unsigned int PC);
+
+    string btbDump();
 };
 #endif

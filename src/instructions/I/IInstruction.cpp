@@ -66,14 +66,18 @@ public:
 		setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
 
 		INSTRUCTIONS opcode = getOpCode();
-		if (opcode == BEQ || opcode == BNE || opcode == BGTZ || opcode == BLEZ
-				|| opcode == BLTZ || opcode == BGEZ) {
+		if (opcode == BEQ || opcode == BNE || opcode == BGTZ ||
+                opcode == BLEZ || opcode == BLTZ || opcode == BGEZ) {
 			isBranch = true;
 		}
 
 		if (opcode == SW || opcode == LW) {
 			setExecuteCyclesLeft(2);
 		}
+
+        if (isBranch || opcode == SW) {
+            hasRegisterOutput = false;
+        }
 
 	}
 
@@ -132,12 +136,12 @@ public:
 		return registerS;
 	}
 
-	unsigned int getImmediate() {
+	int getImmediate() {
 		return immediate;
 	}
 
 	int getArg2() {
-		assert(false);
+		return registerT;
 	}
 
 	string instructionString() {

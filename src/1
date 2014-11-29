@@ -26,7 +26,6 @@ private:
 	static unsigned int executionCycle;
 
     bool done;
-
     ofstream logFile;
 
 	void flush();   // to flush all hardware on wrong branch prediction.

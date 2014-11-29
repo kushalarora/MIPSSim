@@ -11,9 +11,8 @@ unsigned int BranchTargetBuffer::getNextPC(unsigned int PC) {
 	if (buffer.count(PC) > 0) {
 		BTBEntry* btbEntry = buffer.at(PC);
 
-		if (btbEntry->prediction) {
+		if (btbEntry->taken) {
 			nextPC = btbEntry->predictedPC;
-
 		}
 
 		// Update the tick value to keep LRU behavior
@@ -31,10 +30,10 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 	if (buffer.count(PC) > 0) {
 		BTBEntry* btbEntry = buffer.at(PC);
 		btbEntry->predictedPC = nextPC;
-		btbEntry->prediction = taken;
+		btbEntry->taken = taken;
 	} else {
 		BTBEntry* btbEntry = new BTBEntry(nextPC, taken);
-
+        cout << "BTB: " << PC << "Taken: " << btbEntry->taken << " NextPC: " << btbEntry->predictedPC << endl;
 		// If BTB is full then delete the LRU entry
 		if (size == MAXSIZE) {
 			int minKey = 0;
@@ -63,4 +62,21 @@ void BranchTargetBuffer::updateOrAdd(unsigned int PC, unsigned int nextPC,
 		buffer[PC] = btbEntry;
 		lastedTickedAt[PC] = tick;
 	}
+}
+
+
+string BranchTargetBuffer::btbDump() {
+    stringstream ss;
+    ss << "BTB:";
+    int i = 1;
+    for (map<int, BTBEntry*>::iterator it = buffer.begin();
+            it != buffer.end(); it++) {
+        ss << endl << "[" << "Entry " << i << "]:";
+
+        BTBEntry* entry = it->second;
+        // TODO::What is not set funda
+        ss << "<" << it->first << "," << entry->predictedPC<<",";
+        ss << (entry->taken ? 1 : 0) << ">";
+    }
+    return ss.str();
 }
