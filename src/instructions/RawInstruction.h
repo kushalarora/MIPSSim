@@ -9,6 +9,7 @@ private:
 	unsigned int address;
 	string bitString;
 	unsigned int decodeCycle;
+    bool outcome;
 
 public:
 	unsigned int getAddress() {
@@ -21,7 +22,16 @@ public:
 		return decodeCycle;
 	}
 
+    void setOutCome(bool outcome) {
+        this->outcome = outcome;
+    }
+
+    bool getOutCome() {
+        return outcome;
+    }
+
 	RawInstruction(Data* data, unsigned int decodeCycle) {
+        outcome = false;
 		address = data->getAddress();
 		bitString = data->getBitString();
 		this->decodeCycle = decodeCycle;

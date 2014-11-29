@@ -27,13 +27,15 @@ void Executor::instFetchStage() {
     if (inst->getOpCode() == BREAK) {
         codeSegmentEnd = nextPC;
     }
-
-	instructionQueue.push_back(new RawInstruction(data, getExecutionCycle() + 1));
+    RawInstruction* rawInst = new RawInstruction(data, getExecutionCycle() + 1);
+	instructionQueue.push_back(rawInst);
 	cout << "	Pushed Instruction at address: " << data->getAddress()<<endl;
 	// Check BTB for next address
 	// update nextPC
     if (inst->getOpCode() == J || inst->isBranchInst()) {
         nextPC = btb->getNextPC(nextPC, inst->getDestination());
+        rawInst->setOutCome(nextPC == inst->getDestination());
+        cout << "Branch Fetch Outcome: " << rawInst->getOutCome() << endl;
     } else {
         nextPC = nextPC + 4;
     }
@@ -55,7 +57,7 @@ void Executor::decodeStage() {
 	// Else decode Instruction using instructionBuilder.
 	Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
 			rawInst->getBitString(), executionCycle + 1);
-
+	instruction->setOutCome(rawInst->getOutCome());
 	cout << "	Decode Instruction: " << instruction->instructionString()<<endl;
 
 	INSTRUCTIONS opCode = instruction->getOpCode();
@@ -67,6 +69,7 @@ void Executor::decodeStage() {
 		// IN NOP or BREAK and slot available in ROB, simply add
 		ROBSlot* slotEntry = rob->queueInstruction(instruction);
 		instruction->setROBSlot(slotEntry);
+        slotEntry->makeReady();
 		instructionQueue.pop_front();
 
 	} else if ((!rob->isFull()) && (!resStation->isFull())) {
@@ -192,16 +195,20 @@ void Executor::executeStage() {
                 instruction->getROBSlot()->setDestination(newAddress);
 
                 // Update instruction about the outcome.
-                instruction->setOutCome(outcome);
+                cout << instruction->getOutCome() << endl;
+                if(outcome != instruction->getOutCome()) {
+                    instruction->setFlush();
+                }
 
+                instruction->setOutCome(outcome);
                 //Mark the instruction ready
                 instruction->getROBSlot()->makeReady();
                 instruction->setExecutionCycle(executionCycle + 1);
                 instruction->decrementExecuteCyclesLeft();
                 aluUsed++;
-                if (outcome) {
-                    nextPC = newAddress;
-                }
+              //  if (outcome) {
+              //      nextPC = newAddress;
+              //  }
             } else {
                 //Write the result to CDB
                 cout << "	Executing ALU Inst: " << instruction->instructionString()<<endl;
@@ -280,23 +287,20 @@ void Executor::commitStage() {
        // If BREAK, this is the last cycle.
        cout << " 	Commiting BREAK " << inst->instructionString() << endl;
        done = true;
-
+       return;
     // Branching:
     } else if (opCode == J || inst->isBranchInst()) {
 		// check the ROB's next instruction's address
 		// is same as destination
-		ROBSlot* nextSlot = rob->peekTop();
-		Instruction* nextInst = nextSlot->getInstruction();
-
 		cout << " 	Commiting J OR BRANCH " << inst->instructionString() << endl;
 
 		//  if not same,
-		if (!inst->getOutCome()) {
+		if (inst->shallFlush()) {
 			// then flush the whole system
 			// (ROB, RS, IQ, Register Status)
 			cout << " 	BRANCH not taken" << endl;
 			flush();
-
+			nextPC = slot->getDestination();
 			return;
 		}
 
@@ -315,8 +319,9 @@ void Executor::commitStage() {
 
     // finally vacate the reservation station.
 	int RSId = inst->getRSId();
-	assert(RSId > -1);
-	resStation->remove(RSId);
+    if (RSId != -1) {
+        resStation->remove(RSId);
+    }
 }
 
 void Executor::run() {
@@ -349,9 +354,13 @@ string Executor::instructionQueueDump() {
     for (deque<RawInstruction*>::iterator it = instructionQueue.begin();
             it != instructionQueue.end(); it++) {
         ss << endl << "[";
-        ss << InstructionBuilder::build((*it)->getAddress(),
-                (*it)->getBitString())->instructionString();
-        ss << "] ";
+        Instruction* inst = InstructionBuilder::build((*it)->getAddress(),
+                (*it)->getBitString());
+        ss << inst->instructionString();
+        ss << "]";
+        if (inst->getOpCode() != NOP) {
+            ss << " ";
+        }
     }
     return ss.str();
 }

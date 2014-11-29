@@ -27,6 +27,7 @@ public:
 		RSId = -1;
 		hasRegisterOutput = true;
 		executeCyclesLeft = 1;
+        branchOutCome = false;
 	}
 
 	Instruction(unsigned int address, string bitString,
@@ -38,7 +39,9 @@ public:
 		robSlot = NULL;
 		RSId = -1;
 		hasRegisterOutput = true;
+        flush = false;
 		executeCyclesLeft = 1;
+        branchOutCome = false;
 	}
 
 	virtual string instructionString() = 0;
@@ -105,6 +108,14 @@ public:
         this->branchOutCome = branchOutCome;
     }
 
+    bool shallFlush() {
+        return flush;
+    }
+
+    void setFlush() {
+        flush = true;
+    }
+
 	virtual int getArg1() = 0;
 
 	virtual int getArg2() = 0;
@@ -139,6 +150,7 @@ protected:
 	unsigned int executionCycle;
 	unsigned int executeCyclesLeft;
     bool branchOutCome;
+    bool flush;
 };
 
 #endif
