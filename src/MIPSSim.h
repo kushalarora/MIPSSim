@@ -12,8 +12,8 @@ struct Arguments {
 	char* outputFileName;
 	Operation operation;
 	bool printAllCycle;
-	string startCycle;
-	string endCycle;
+	int startCycle;
+	int endCycle;
 };
 bool isSimulation(const Arguments& input);
 bool isDisAssembly(const Arguments& input);

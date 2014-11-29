@@ -21,12 +21,15 @@ Arguments& readArgs(int argc, char** argv) {
 		args->printAllCycle = false;
 
 		string range(argv[3]);
-		assert(string("-T").compare(range.substr(0, 2)));
+		assert(string("-T").compare(range.substr(0, 2)) == 0);
 
 		int colPosition = range.find(":");
-		args->startCycle = range.substr(2, colPosition);
-		args->endCycle = range.substr(colPosition + 1);
-	}
+		args->startCycle = atoi(range.substr(2, colPosition - 2).c_str());
+		args->endCycle = atoi(range.substr(colPosition + 1).c_str());
+	} else {
+        args->startCycle = -1;
+        args->endCycle = -1;
+    }
 	return *args;
 }
 
@@ -49,7 +52,7 @@ bool readline(ifstream& file, string& str) {
 int main(int argc, char* argv[]) {
 	Arguments args = readArgs(argc, argv);
 	Simulator* simulator = SimulatorBuilder::build(args.outputFileName,
-			args.operation);
+			args.operation, args.startCycle, args.endCycle);
 
 	ifstream infile;
 	infile.open(args.inputFileName, ios::in | ios::binary);

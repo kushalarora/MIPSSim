@@ -31,6 +31,10 @@ private:
 
     int codeSegmentEnd;
 
+    int startCycle;
+
+    int endCycle;
+
 	void flush();   // to flush all hardware on wrong branch prediction.
 public:
 	void instFetchStage();
@@ -58,7 +62,7 @@ public:
     }
 
 	Executor(char* logFileName, CDB* cdb, BranchTargetBuffer* btb, RegisterStatus* regStatus,
-            Registers* registers,  ROB* rob, ReservationStation* resStation) : Simulator(logFileName) {
+            Registers* registers,  ROB* rob, ReservationStation* resStation, int startCycle, int endCycle) : Simulator(logFileName) {
 		nextPC = 600;
         done = false;
         codeSegmentEnd = 712;
@@ -68,6 +72,8 @@ public:
         this->registers = registers;
 		this->rob = rob;
 		this->resStation = resStation;
+        this->startCycle = startCycle;
+        this->endCycle = endCycle;
 
         done = false;
 	}

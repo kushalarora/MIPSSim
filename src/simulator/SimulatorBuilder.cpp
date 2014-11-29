@@ -17,7 +17,7 @@ using namespace std;
 #define __MIPS_SIMBUILDER__
 class SimulatorBuilder {
 public:
-	static Simulator* build(char* outFile, Operation operation) {
+	static Simulator* build(char* outFile, Operation operation, int startCycle, int endCycle) {
 		if (operation == DIS) {
 			return new DisAssembler(outFile);
 		} else if (operation == SIM) {
@@ -30,7 +30,7 @@ public:
             Registers* registers = new Registers();
             ReservationStation* resStation = new ReservationStation(cdb, regStatus, tempMap, registers, rob);
 
-            return new Executor(outFile, cdb, btb, regStatus, registers, rob, resStation);
+            return new Executor(outFile, cdb, btb, regStatus, registers, rob, resStation, startCycle, endCycle);
 		}
 		cerr << "Unknown Operation: " << operation;
 	}

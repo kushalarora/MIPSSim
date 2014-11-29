@@ -326,17 +326,29 @@ void Executor::commitStage() {
 
 void Executor::run() {
 
+    logFile.open(getLogFileName(), ofstream::out);
 	while (!done) {
 		executionCycle++;
 
 		cout << "Execution Cycle: " << executionCycle<<endl;
 		instFetchStage();
 		decodeStage();
-		dumpLog();
+        if (startCycle != -1 && endCycle != -1
+                && executionCycle >= startCycle
+                && executionCycle <= endCycle) {
+
+            logFile << "Cycle <" << executionCycle << ">:"<<endl;
+            dumpLog();
+
+        }
 		executeStage();
 		writeResultStage();
 		commitStage();
 	}
+
+    logFile << "Final Cycle <" << executionCycle << ">:"<<endl;
+    dumpLog();
+    logFile.close();
 }
 
 void Executor::flush() {
@@ -379,13 +391,10 @@ string Executor::memoryDump() {
 
 
 void Executor::dumpLog() {
-    logFile.open(getLogFileName(), ofstream::app);
-    logFile << "Cycle <" << executionCycle << ">:"<<endl;
     logFile << instructionQueueDump()<<endl;
     logFile << resStation->resStationDump()<<endl;
     logFile << rob->robDump()<<endl;
     logFile << btb->btbDump()<<endl;
     logFile << registers->registersDump()<<endl;
     logFile << memoryDump()<<endl;
-    logFile.close();
 }
