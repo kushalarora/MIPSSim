@@ -37,8 +37,11 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		if (regStatus->isSet(register1)) {
 			int ROBId = regStatus->get(register1);
 			int ROBValue = rob->getValue(ROBId);
+			int cdbValue = cdb->get(ROBId);
 			if (ROBValue != ROBSlot::DEFAULT_VALUE) {
 				Vj = ROBValue;
+			} else if(cdbValue != CDB::DEFAULT_VALUE) {
+				Vj = cdbValue;
 			} else {
 				Qj = ROBId;
 			}
@@ -54,8 +57,11 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 			if (regStatus->isSet(register2)) {
 				int ROBId = regStatus->get(register2);
 				int ROBValue = rob->getValue(ROBId);
+				int cdbValue = cdb->get(ROBId);
 				if (ROBValue != ROBSlot::DEFAULT_VALUE) {
 					Vk = ROBValue;
+				} else if(cdbValue != CDB::DEFAULT_VALUE) {
+					Vk = cdbValue;
 				} else {
 					Qk = ROBId;
 				}
@@ -72,8 +78,11 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		if (regStatus->isSet(register1)) {
 			int ROBId = regStatus->get(register1);
 			int ROBValue = rob->getValue(ROBId);
+			int cdbValue = cdb->get(ROBId);
 			if (ROBValue != ROBSlot::DEFAULT_VALUE) {
 				Vj = ROBValue;
+			} else if(cdbValue != CDB::DEFAULT_VALUE) {
+				Vj = cdbValue;
 			} else {
 				Qj = ROBId;
 			}
@@ -85,8 +94,11 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		if (regStatus->isSet(register2)) {
 			int ROBId = regStatus->get(register2);
 			int ROBValue = rob->getValue(ROBId);
+			int cdbValue = cdb->get(ROBId);
 			if (ROBValue != ROBSlot::DEFAULT_VALUE) {
 				Vk = ROBValue;
+			} else if(cdbValue != CDB::DEFAULT_VALUE) {
+				Vk = cdbValue;
 			} else {
 				Qk = ROBId;
 			}

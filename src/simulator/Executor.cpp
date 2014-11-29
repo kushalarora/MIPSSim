@@ -191,12 +191,17 @@ void Executor::executeStage() {
                 //Update ROB with the destination and branch outcome
                 instruction->getROBSlot()->setDestination(newAddress);
 
+                // Update instruction about the outcome.
+                instruction->setOutCome(outcome);
+
                 //Mark the instruction ready
                 instruction->getROBSlot()->makeReady();
                 instruction->setExecutionCycle(executionCycle + 1);
                 instruction->decrementExecuteCyclesLeft();
                 aluUsed++;
-                nextPC = newAddress;
+                if (outcome) {
+                    nextPC = newAddress;
+                }
             } else {
                 //Write the result to CDB
                 cout << "	Executing ALU Inst: " << instruction->instructionString()<<endl;
@@ -286,7 +291,7 @@ void Executor::commitStage() {
 		cout << " 	Commiting J OR BRANCH " << inst->instructionString() << endl;
 
 		//  if not same,
-		if (destination != nextInst->getAddress()) {
+		if (!inst->getOutCome()) {
 			// then flush the whole system
 			// (ROB, RS, IQ, Register Status)
 			cout << " 	BRANCH not taken" << endl;

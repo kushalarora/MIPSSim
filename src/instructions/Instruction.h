@@ -96,6 +96,15 @@ public:
 		executeCyclesLeft--;
 	}
 
+
+    bool getOutCome() {
+        return branchOutCome;
+    }
+
+    void setOutCome(bool branchOutCome) {
+        this->branchOutCome = branchOutCome;
+    }
+
 	virtual int getArg1() = 0;
 
 	virtual int getArg2() = 0;
@@ -129,6 +138,7 @@ protected:
 	bool hasRegisterOutput;
 	unsigned int executionCycle;
 	unsigned int executeCyclesLeft;
+    bool branchOutCome;
 };
 
 #endif
