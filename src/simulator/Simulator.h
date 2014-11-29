@@ -51,6 +51,10 @@ protected:
 	char* getLogFileName() {
 		return logFileName;
 	}
+    
+    void instructionQueueFlush() {
+        instructionQueue.clear();
+    }
 
 	unsigned int getIndexFromAddress(unsigned int address) {
 		return (address - BASE_PC) / 4;

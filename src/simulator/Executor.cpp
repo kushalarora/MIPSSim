@@ -35,7 +35,6 @@ void Executor::decodeStage() {
 		return;
 	}
 
-    instructionQueue.pop_front();
 
 	// Else decode Instruction using instructionBuilder.
 	Instruction* instruction = InstructionBuilder::build(rawInst->getAddress(),
@@ -52,6 +51,7 @@ void Executor::decodeStage() {
 		// IN NOP or BREAK and slot available in ROB, simply add
 		ROBSlot* slotEntry = rob->queueInstruction(instruction);
 		instruction->setROBSlot(slotEntry);
+		instructionQueue.pop_front();
 
 	} else if ((!rob->isFull()) && (!resStation->isFull())) {
 
@@ -68,6 +68,7 @@ void Executor::decodeStage() {
 			regStatus->set(instruction->getDestination(),
 					slotEntry->getIndex());
 		}
+		instructionQueue.pop_front();
 
 	}
 }
@@ -177,8 +178,9 @@ void Executor::executeStage() {
                 //Mark the instruction ready
                 instruction->getROBSlot()->makeReady();
                 instruction->setExecutionCycle(executionCycle + 1);
+                instruction->decrementExecuteCyclesLeft();
                 aluUsed++;
-
+                nextPC = newAddress;
             } else {
                 //Write the result to CDB
                 cout << "	Executing ALU Inst: " << instruction->instructionString()<<endl;
@@ -274,8 +276,7 @@ void Executor::commitStage() {
 			cout << " 	BRANCH not taken" << endl;
 			flush();
 
-			// and update nextPC;
-			nextPC = destination;
+			return;
 		}
 
 	} else if (opCode == SW) {
@@ -317,6 +318,7 @@ void Executor::flush() {
 	resStation->flush();
 	regStatus->flush();
 	cdb->flush();
+    instructionQueueFlush();
 }
 
 

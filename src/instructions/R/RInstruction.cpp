@@ -41,11 +41,11 @@ private:
 	}
 
 	int executeADD(int vj, int vk) {
-		return vj + registerD;
+		return vj + vk;
 	}
 
 	int executeADDU(int vj, int vk) {
-		return vj + registerD;
+		return vj + vk;
 	}
 
 	int executeAND(int vj, int vk) {

@@ -66,7 +66,7 @@ public:
 		setOpCode(OpcodeMap::strToOpCodeMap[bitString.substr(0, 6)]);
 
 		INSTRUCTIONS opcode = getOpCode();
-		if (opcode == BEQ || opcode == BNE || opcode == BGTZ || 
+		if (opcode == BEQ || opcode == BNE || opcode == BGTZ ||
                 opcode == BLEZ || opcode == BLTZ || opcode == BGEZ) {
 			isBranch = true;
 		}
@@ -141,7 +141,7 @@ public:
 	}
 
 	int getArg2() {
-		assert(false);
+		return registerT;
 	}
 
 	string instructionString() {

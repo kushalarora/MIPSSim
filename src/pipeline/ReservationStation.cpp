@@ -50,7 +50,7 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		// For following instruction, registerT is used as 2nd argument
 		if (opCode == SW || opCode == LW ||
                 opCode == BEQ || opCode == BNE) {
-			int register2 = instruction->getDestination();
+			int register2 = instruction->getArg2();
 			if (regStatus->isSet(register2)) {
 				int ROBId = regStatus->get(register2);
 				int ROBValue = rob->getValue(ROBId);
@@ -149,7 +149,6 @@ void ReservationStation::updateFromCDB() {
 		if (Qj != RSEntry::DEFAULT_VALUE) {
 			int value = cdb->get(Qj);
             int valueFromROB = rob->getValue(Qj);
-            int register1 = instruction->getArg1();
 			if (value != CDB::DEFAULT_VALUE) {
 				entry->setVj(value);
 				entry->resetQj();
