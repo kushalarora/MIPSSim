@@ -44,6 +44,11 @@ void ROB::updateFromCDB() {
 		if (inst->getExecutionCycle() > executionCycle) {
 			continue;
 		}
+        
+        // if already ready, just continue
+		if (slot->isReady()) {
+			continue;
+		}
 
 		// If ROBId in cdb.
 		// Update value and make it ready for commit
@@ -60,12 +65,12 @@ void ROB::updateFromCDB() {
 
 string ROB::robDump() {
     stringstream ss;
-    ss << "ROB:" << endl;
+    ss << "ROB:";
 	for (deque<ROBSlot*>::iterator it = robQueue.begin();
             it != robQueue.end(); it++) {
 		ROBSlot* slot = *it;
 		Instruction* inst = slot->getInstruction();
-        ss << "[" << inst->instructionString() << "]" << endl;
+        ss << endl << "[" << inst->instructionString() << "] ";
 	}
     return ss.str();
 }

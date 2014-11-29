@@ -9,12 +9,11 @@ class Registers {
     public:
         Registers() {
             for (int i = 0; i < 32; i++) {
-                reg[i] = INT_MIN;
+                reg[i] = 0;
             }
         }
         int get(int regNo) {
             assert (regNo >= 0 && regNo < 32);
-            cout << regNo <<endl;
             return reg[regNo];
         }
 
@@ -36,7 +35,7 @@ class Registers {
                     }
                     ss << i << ":";
                 }
-                ss << " " << reg[i]; 
+                ss << "\t" << reg[i];
             }
             return ss.str();
         }

@@ -1,5 +1,5 @@
 #include "ReservationStation.h"
-
+#include "../simulator/Executor.h"
 const int RSEntry::DEFAULT_VALUE = INT_MIN;
 const int RSEntry::DEFAULT_Q = 0;
 
@@ -24,7 +24,7 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 	// Address field to be populated.
 	INSTRUCTION_TYPE type = instruction->getType();
 	INSTRUCTIONS opCode = instruction->getOpCode();
-                    
+
 	// Update A for LOAD and STORE inst.
 	if (opCode == SW || opCode == LW) {
 		A = instruction->getImmediate();
@@ -39,7 +39,7 @@ RSEntry* ReservationStation::add(Instruction* instruction) {
 		} else {
 			Vj = registers->get(register1);
 		}
-        
+
 
 		// For STORE update value to be stored as second operand
 		if (opCode == SW) {
@@ -109,6 +109,12 @@ void ReservationStation::updateFromCDB() {
 	for (vector<RSEntry*>::iterator it = reservations.begin();
 			it != reservations.end(); it++) {
 		RSEntry* entry = *it;
+        // Ignore inst to be executed in future cycles.
+		Instruction* instruction = entry->getInstruction();
+		int currentExecutionCycle = Executor::getExecutionCycle();
+		if (instruction->getExecutionCycle() > currentExecutionCycle) {
+			continue;
+		}
 
 		// Check Qj and Qk for each one of them
 		// If not zero, check CDB
@@ -135,13 +141,13 @@ void ReservationStation::updateFromCDB() {
 
 string ReservationStation::resStationDump() {
     stringstream ss;
-    ss << "RS:" << endl;
+    ss << "RS:";
 	for (vector<RSEntry*>::iterator it = reservations.begin();
 			it != reservations.end(); it++) {
 		RSEntry* entry = *it;
         Instruction* inst = entry->getInstruction();
-        
-        ss << "[" << inst->instructionString() << "]" << endl;
+
+        ss << endl << "[" << inst->instructionString() << "] ";
     }
     return ss.str();
 }
