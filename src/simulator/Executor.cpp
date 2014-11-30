@@ -333,7 +333,7 @@ void Executor::run() {
 		cout << "Execution Cycle: " << executionCycle<<endl;
 		instFetchStage();
 		decodeStage();
-        if (startCycle == -1 && endCycle == -1
+        if ((startCycle == -1 && endCycle == -1)
                 || (executionCycle >= startCycle
                 && executionCycle <= endCycle)) {
 
