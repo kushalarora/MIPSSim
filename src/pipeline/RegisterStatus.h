@@ -7,7 +7,7 @@ private:
 	int registerStatus[32];
 
 public:
-	const int DEFAULT_VALUE = INT_MIN;
+	static const int DEFAULT_VALUE = INT_MIN;
 	RegisterStatus() {
 		for (int i = 0; i < 32; i++) {
 			registerStatus[i] = DEFAULT_VALUE;
